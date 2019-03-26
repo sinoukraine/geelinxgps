@@ -22,6 +22,18 @@
         },
         "cordova-plugin-whitelist": {
             "PACKAGE_NAME": "com.warden.app"
+        },
+        "cordova-plugin-device": {
+            "PACKAGE_NAME": "com.classiccarconcierge.app"
+        },
+        "cordova-plugin-buildinfo": {
+            "PACKAGE_NAME": "com.classiccarconcierge.app"
+        },
+        "cordova-plugin-splashscreen": {
+            "PACKAGE_NAME": "com.classiccarconcierge.app"
+        },
+        "cordova-plugin-camera": {
+            "PACKAGE_NAME": "com.classiccarconcierge.app"
         }
     },
     "dependent_plugins": {}
