@@ -911,6 +911,7 @@ App.onPageInit('forgotPwd', function(page) {
 
     });
 });
+
 App.onPageInit('forgotPwdCode', function(page) {
     $$('.sendVerifyCode').on('click', function() {
         var VerifyCode = $$(page.container).find('input[name="VerifyCode"]').val();
