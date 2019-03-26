@@ -3,7 +3,7 @@
   version="1.0.0"
   android-versionCode="1" 
   ios-CFBundleVersion="1" 
-  id="com.varden.app" 
+  id="com.warden.app" 
   xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns="http://www.w3.org/ns/widgets" defaultlocale="en-US" >
     <name>Warden</name>
     <description>
@@ -46,9 +46,9 @@
     <platform name="android">
       <resource-file src="google-services.json" target="google-services.json" />
     </platform>
-    <platform name="ios">
+    <!-- <platform name="ios">
       <resource-file src="GoogleService-Info.plist" />
-    </platform>
+    </platform> -->
     
     <!-- <plugin name="cordova-plugin-console" source="npm" spec="1.0.7" /> -->
     <plugin name="cordova-plugin-statusbar" source="npm" spec="2.1.3" />
