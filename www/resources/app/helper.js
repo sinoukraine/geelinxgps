@@ -775,8 +775,8 @@ Protocol.Common = JClass({
         this.AlarmOptions = arg.AlarmOptions;
         this._FIELD_FLOAT8 = arg._FIELD_FLOAT8;
         this.StatusNew = arg.StatusNew;    
-        this._FIELD_INT2 = arg._FIELD_INT2; 
-        this.GroupCode = arg.GroupCode;     
+        this._FIELD_INT2 = arg._FIELD_INT2;
+        this.GroupCode = arg.GroupCode;   
     
     },
     initDeviceInfoEx:function(){},
