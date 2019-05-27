@@ -59,7 +59,7 @@ var AppDetails = {
     code: 36,
     supportCode: 36,
     appId: '',
-    appleId: '',
+    appleId: '1457980996',
 };
 
 if (navigator.userAgent.match(/Windows/i)) {
