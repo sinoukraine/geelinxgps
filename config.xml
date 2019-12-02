@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget 
-  version="1.0.1"
-  android-versionCode="3" 
-  ios-CFBundleVersion="3" 
+  version="1.0.2"
+  android-versionCode="4" 
+  ios-CFBundleVersion="4" 
   id="com.warden.app" 
-  xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns="http://www.w3.org/ns/widgets" defaultlocale="en-US" >
+  xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:android="http://schemas.android.com/apk/res/android" defaultlocale="en-US" >
     <name>Warden</name>
     <description>
        Warden GPS tracker
@@ -13,7 +13,7 @@
         Warden Co Limited
     </author>
     <content src="index.html" />
-    <access origin="*" />
+    <access origin="*"  allows-arbitrary-loads-for-media='true' allows-arbitrary-loads-in-web-content='true' allows-local-networking='true' />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
     <allow-intent href="tel:*" />
@@ -27,24 +27,31 @@
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
     </platform>
+    <platform name="android">
+      <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
+          <application android:usesCleartextTraffic="true" />
+      </edit-config>
+    </platform>
+
+    <preference name="loadUrlTimeoutValue" value="700000" />
     <preference name="DisallowOverscroll" value="true" />
     <preference name="Orientation" value="portrait" />
-    <preference name="android-minSdkVersion" value="18" />
+    <preference name="android-minSdkVersion" value="19" />
     <!-- <preference name="android-maxSdkVersion" value="27" /> -->
-    <preference name="android-targetSdkVersion" value="26" />
+    <preference name="android-targetSdkVersion" value="28" />
     <preference name="multiDexEnabled" value="true" />     
     <preference name="deployment-target" value="10.2" />
     <preference name="StatusBarOverlaysWebView" value="false" />
     <!-- <preference name="StatusBarBackgroundColor" value="#333" /> -->
     <preference name="StatusBarStyle" value="blacktranslucent" />
-    <preference name="phonegap-version" value="cli-7.1.0" />
+    <preference name="phonegap-version" value="cli-9.0.0" />
 
     <preference name="android-build-tool" value="gradle" />
     <plugin name="phonegap-plugin-push" source="npm" spec="2.1.2">
         <variable name="SENDER_ID" value="1097482483564" />
     </plugin>
     <platform name="android">
-      <resource-file src="google-services.json" target="google-services.json" />
+      <resource-file src="google-services.json" target="app/google-services.json" />
     </platform>
     <platform name="ios">
       <resource-file src="GoogleService-Info.plist" />
