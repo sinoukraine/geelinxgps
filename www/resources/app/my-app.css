@@ -286,6 +286,7 @@ select[name='Unit'] option {
 /* INDEX PAGE */
 
 .menu_header {
+    position:relative;
     height: 160px;
     width: 100%;
     background: url('../images/navigation_header.png') no-repeat center center;
@@ -295,6 +296,12 @@ select[name='Unit'] option {
 
 .menu_header img {
     width: 80%;
+}
+.app-version{
+    position: absolute;
+    bottom: 0;
+    right: 8px;
+    font-size: 10px;
 }
 
 
