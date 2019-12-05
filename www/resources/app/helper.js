@@ -469,17 +469,23 @@ Protocol = {
         },    
         createMap: function(option){
             var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { name: 'osm', attribution: '' });            
-            var googleStreets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}'+'&hl='+lang,{
+            var googleStreets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
                 maxZoom: 22,
                 subdomains:['mt0','mt1','mt2','mt3']
             });           
-            var googleSatelitte = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}'+'&hl='+lang,{
+            var googleSatelitte = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
                 maxZoom: 20,
                 subdomains:['mt0','mt1','mt2','mt3']
             });  
          
 
-            var map = L.map(option.target, { zoomControl: false, center: option.latLng, zoom: option.zoom, fullscreenControl: true, layers: [googleStreets] }); 
+            var map = L.map(option.target, {
+                zoomControl: false,
+                center: option.latLng,
+                zoom: option.zoom,
+                fullscreenControl: true,
+                drawControl: option.drawControl ? option.drawControl : false,
+                layers: [googleStreets] });
                         
             var layers = {
                 "<span class='mapSwitcherWrapper googleSwitcherWrapper'><img class='layer-icon' src='resources/images/googleRoad.png' alt='' /> <p>Map</p></span>": googleStreets,
@@ -565,6 +571,9 @@ Protocol = {
                             asset.posInfo.speed = 0;
                         }
                         ret.speed = {};
+                        if (asset.posInfo.speed<0){
+                            asset.posInfo.speed=0;
+                        }
                         ret.speed.value = Protocol.Helper.getSpeedValue(asset.Unit, asset.posInfo.speed) + ' ' + Protocol.Helper.getSpeedUnit(asset.Unit);
                     }
                     if(asset.haveFeature("TempSensor")){

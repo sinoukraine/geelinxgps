@@ -51,8 +51,8 @@ function getPlusInfo() {
         if (!localStorage.PUSH_DEVICE_TOKEN)
             localStorage.PUSH_DEVICE_TOKEN = uid;
         //localStorage.PUSH_DEVICE_TOKEN = "75ba1639-92ae-0c4c-d423-4fad1e48a49d"
-        localStorage.PUSH_APPID_ID = 'android.app.quiktrak.eu.warden';
-        localStorage.DEVICE_TYPE = "android.app.quiktrak.eu.warden";
+        localStorage.PUSH_APPID_ID = 'android.app.quiktrak.eu.quiktrak';
+        localStorage.DEVICE_TYPE = "android.app.quiktrak.eu.quiktrak";
     }
 }
 
@@ -121,7 +121,7 @@ function setupPush() {
             //"senderID": "264121929701"                             
         },
         "browser": {
-            pushServiceURL: 'http://push.api.phonegap.com/v1/push'
+            pushServiceURL: 'https://push.api.phonegap.com/v1/push'
         },
         "ios": {
             "sound": true,
@@ -164,11 +164,9 @@ function setupPush() {
 
             App.showIndicator();
             window.loginTimer = setInterval(function() {
-                //alert(window.loginDone);
                 if (window.loginDone) {
-                    clearInterval(window.loginTimer);
+                    clearInterval(loginTimer);
                     setTimeout(function() {
-                        //alert('before processClickOnPushNotification');
                         processClickOnPushNotification([data.additionalData.payload]);
                         App.hideIndicator();
                     }, 1000);
@@ -204,12 +202,12 @@ function setupPush() {
         );
     }
 }
-
 function setAppVersion(){
     if (BuildInfo.version){
         $$('.appVersion').text("v" + BuildInfo.version);
     }
 }
+
 
 function onAppPause() {
 
@@ -296,17 +294,19 @@ var prevStatusLatLng = {
 };
 
 var geofenceMarkerGroup = false;
+var AllMarkersGroup = false;
+var GeofenceFiguresGroup = new L.FeatureGroup();
 
-var API_DOMIAN1 = "http://api.m2mglobaltech.com/QuikTrak/V1/";
+var API_DOMIAN1 = "https://api.m2mglobaltech.com/QuikTrak/V1/";
 var API_DOMIAN2 = "";
-var API_DOMIAN3 = "http://api.m2mglobaltech.com/QuikProtect/V1/";
-var API_DOMIAN4 = "http://api.m2mglobaltech.com/Quikloc8/V1/";
+var API_DOMIAN3 = "https://api.m2mglobaltech.com/QuikProtect/V1/";
+var API_DOMIAN4 = "https://api.m2mglobaltech.com/Quikloc8/V1/";
 var API_URL = {};
 API_URL.URL_GET_LOGIN = API_DOMIAN1 + "User/Auth?username={0}&password={1}&appKey={2}&mobileToken={3}&deviceToken={4}&deviceType={5}";
 //API_URL.URL_GET_LOGOUT2 = API_DOMIAN1 + "User/Logoff2?MajorToken={0}&MinorToken={1}&username={2}&mobileToken={3}";
 API_URL.URL_GET_LOGOUT = API_DOMIAN1 + "User/Logoff2?mobileToken={0}&deviceToken={1}";
 API_URL.URL_EDIT_ACCOUNT = API_DOMIAN1 + "User/Edit?MajorToken={0}&MinorToken={1}&FirstName={2}&SubName={3}&Mobile={4}&Phone={5}&EMail={6}";
-API_URL.URL_EDIT_DEVICE = API_DOMIAN1 + "Device/Edit?MinorToken={0}&Code={1}&name={2}&speedUnit={3}&initMileage={4}&initAccHours={5}&attr1={6}&attr2={7}&attr3={8}&attr4={9}&tag={10}&icon={11}&MajorToken={12}";
+API_URL.URL_EDIT_DEVICE = API_DOMIAN1 + "Device/Edit?MinorToken={0}&Code={1}&name={2}&speedUnit={3}&initMileage={4}&initAccHours={5}&attr1={6}&attr2={7}&attr3={8}&attr4={9}&tag={10}&icon={11}&MajorToken={12}&registration={13}&MaxSpeed={14}&stockNumber=";
 
 /*API_URL.URL_SET_ALARM = API_DOMIAN1 + "Device/AlarmOptions?MinorToken={0}&imei={1}&options={2}";
 API_URL.URL_SET_ALARM2 = API_DOMIAN1 + "Device/AlarmOptions2?MinorToken={0}&imei={1}&options={2}";*/
@@ -318,7 +318,7 @@ API_URL.URL_SET_GEOLOCK_OFF = API_DOMIAN1 + "Device/Unlock?MajorToken={0}&MinorT
 API_URL.URL_GET_POSITION = API_DOMIAN1 + "Device/GetPosInfo?MinorToken={0}&Code={1}";
 API_URL.URL_GET_POSITION2 = API_DOMIAN1 + "Device/GetPosInfo2?MinorToken={0}&Code={1}";
 API_URL.URL_GET_POSITION_ARR = API_DOMIAN1 + "Device/GetHisPosArray?MinorToken={0}&Code={1}&From={2}&To={3}";
-API_URL.URL_GET_POSITION_ARR2 = "http://osrm.sinopacific.com.ua/playback/v4";
+API_URL.URL_GET_POSITION_ARR2 = "https://osrm.sinopacific.com.ua/playback/v4";
 API_URL.URL_GET_ALL_POSITIONS = API_DOMIAN1 + "Device/GetPosInfos?MinorToken={0}";
 API_URL.URL_GET_ALL_POSITIONS2 = API_DOMIAN1 + "Device/GetPosInfos2?MinorToken={0}&MajorToken={1}";
 API_URL.URL_GET_POSITION_GPRS = API_DOMIAN1 + "Device/GprsCommand?MinorToken={0}&Code={1}&Cmd=update";
@@ -326,6 +326,7 @@ API_URL.URL_RESET_PASSWORD = API_DOMIAN1 + "User/Password?MinorToken={0}&oldpwd=
 API_URL.URL_VERIFY_BY_EMAIL = API_DOMIAN3 + "Client/VerifyCodeByEmail?email={0}";
 API_URL.URL_FORGOT_PASSWORD = API_DOMIAN3 + "Client/ForgotPassword?account={0}&newPassword={1}&checkNum={2}";
 API_URL.URL_GET_NEW_NOTIFICATIONS = API_DOMIAN1 + "Device/Alarms?MinorToken={0}&deviceToken={1}";
+API_URL.URL_GET_SPEEDLIMIT = "https://ss.sinopacific.com.ua/speedlimits/v1?latitude={0}&longitude={1}&timestamp=1"
 
 API_URL.URL_SET_ALERT_CONFIG = API_DOMIAN1 + "Device/AlertConfigureEdit";
 API_URL.URL_GET_ALERT_CONFIG = API_DOMIAN1 + "Device/GetAlertConfigure";
@@ -335,8 +336,9 @@ API_URL.URL_GET_GEOFENCE_LIST = API_DOMIAN1 + "Device/GetFenceList";
 API_URL.URL_GEOFENCE_EDIT = API_DOMIAN1 + "Device/FenceEdit";
 API_URL.URL_GEOFENCE_DELETE = API_DOMIAN1 + "Device/FenceDelete";
 API_URL.URL_GET_GEOFENCE_ASSET_LIST = API_DOMIAN1 + "Device/GetFenceAssetList";
-API_URL.URL_PHOTO_UPLOAD = "http://upload.quiktrak.co/image/Upload";
-API_URL.URL_SUPPORT = "http://support.quiktrak.eu/?name={0}&loginName={1}&email={2}&phone={3}&s={4}";
+API_URL.URL_PHOTO_UPLOAD = "https://upload.quiktrak.co/image/Upload";
+
+API_URL.URL_SUPPORT = "https://support.wardengps.com/?name={0}&loginName={1}&email={2}&phone={3}&s={4}";
 API_URL.URL_REPORT_THEFT = "https://forms.quiktrak.com.au/report-theft/?loginName={0}&imei={1}&make={2}&model={3}&rego={4}";
 
 
@@ -346,9 +348,14 @@ API_URL.URL_SET_GEOLOCK = API_DOMIAN4 + "asset/GeoLock?MajorToken={0}&MinorToken
 API_URL.URL_SET_DOOR = API_DOMIAN4 + "asset/door?MajorToken={0}&MinorToken={1}&code={2}&state={3}";
 
 API_URL.URL_ROUTE = "https://www.google.com/maps/dir/?api=1&destination={0},{1}"; //&travelmode=walking
+//API_URL.URL_ROUTE = "maps://maps.apple.com/maps?daddr={0},{1}"; // ios link
 API_URL.URL_REFRESH_TOKEN = API_DOMIAN1 + "User/RefreshToken";
 
 API_URL.URL_USERGUIDE = "https://quiktrakglobal.com/pdf/warden-app.pdf";
+API_URL.URL_REFERRAL_PROGRAM = "https://forms.quiktrak.com.au/referral-program/";
+
+//https://api.m2mglobaltech.com/Quiktrak/V1/Device/AlertConfigureEdit
+//https://api.m2mglobaltech.com/Quiktrak/V1/Device/GetAlertConfigure
 
 
 var cameraButtons = [{
@@ -374,21 +381,6 @@ var cameraButtons = [{
 
 
 
-//http://api.m2mglobaltech.com/QuikTrak/V1/User/Auth?username=tongwei&password=888888&appKey=UcPXWJccwm7bcjvu7aZ7j5&deviceType=android&deviceToken=deviceToken&mobileToken=mobileToken
-//http://api.m2mglobaltech.com/QuikTrak/V1/User/Logoff2?username=tongwei&MinorToken=8944cbf0-7749-4c5e-bdba-8b7c4e47229b&MajorToken=f9087bb0-47ba-4d31-a038-ea676fdf0de2&mobileToken=push mobiletoken
-//http://api.m2mglobaltech.com/QuikTrak/V1/User/Edit?MinorToken=8944cbf0-7749-4c5e-bdba-8b7c4e47229b&MajorToken=f9087bb0-47ba-4d31-a038-ea676fdf0de2&FirstName=Tong&SubName=Wei&Mobile=&Phone=&EMail=tony@quiktrak.net
-//http://api.m2mglobaltech.com/QuikTrak/V1/Device/Edit?MinorToken=588bcf33-1af5-4fb3-8939-0cbc8f949fb3&Code=6562656064&name=testname&speedUnit=KPH&initMileage=8&initAccHours=100&tag=testname1&attr1=Toyota &attr2=Landcruiser&attr3=Black&attr4=2010
-//http://api.m2mglobaltech.com/QuikTrak/V1/Device/GetPosInfo?MinorToken=588bcf33-1af5-4fb3-8939-0cbc8f949fb3&Code=6562656064
-//http://api.m2mglobaltech.com/QuikTrak/V1/Device/GetHisPosArray?MinorToken=588bcf33-1af5-4fb3-8939-0cbc8f949fb3&Code=6562656064&From=2017-02-11T10:00:00&To=2017-02-12T10:00:00
-//http://api.m2mglobaltech.com/QuikTrak/V1/Device/GetPosInfos?MinorToken=588bcf33-1af5-4fb3-8939-0cbc8f949fb3
-//http://api.m2mglobaltech.com/QuikTrak/V1/User/Password?MinorToken=588bcf33-1af5-4fb&oldpwd=888888&newpwd=888888
-//http://api.m2mglobaltech.com/QuikTrak/V1/Device/FenceAdd
-//http://api.m2mglobaltech.com/QuikTrak/V1/Device/GetFenceList
-//http://api.m2mglobaltech.com/QuikTrak/V1/Device/FenceEdit
-//http://api.m2mglobaltech.com/QuikTrak/V1/Device/FenceDelete
-//http://api.m2mglobaltech.com/QuikTrak/V1/Device/AlarmOptions?MinorToken=588bcf33-1af5-4fb3-8939-0cbc8f949fb3&imei=6562656064&options=0
-
-
 var html = Template7.templates.template_Login_Screen();
 $$(document.body).append(html);
 html = Template7.templates.template_Popover_Menu();
@@ -408,7 +400,7 @@ if (inBrowser) {
 
 
 
-var virtualAssetList = App.virtualList('.assets_list', {
+virtualAssetList = App.virtualList('.assets_list', {
     // search item by item
     searchAll: function(query, items) {
         var foundItems = [];
@@ -442,7 +434,7 @@ var virtualAssetList = App.virtualList('.assets_list', {
         var assetFeaturesStatus = Protocol.Helper.getAssetStateInfo(asset);
         //var assetImg = 'resources/images/svg_asset.svg';
 
-
+        //console.log(item);
         var assetImg = getAssetImg(item, { 'assetList': true });
 
         if (assetFeaturesStatus && assetFeaturesStatus.stats) {
@@ -555,7 +547,6 @@ var virtualAssetList = App.virtualList('.assets_list', {
 
 $$('.login-form').on('submit', function(e) {
     e.preventDefault();
-    //login();
     preLogin();
     return false;
 });
@@ -618,6 +609,9 @@ $$('body').on('click', '.sorting_button', function(e) {
     //showMsgNotification([json]);
     //getNewData();
     //console.log($$('.status_page').length);
+
+    var json = '{"title":"Speed","type":32,"imei":"0000001683122697","name":"0000001683122697","lat":50.249984,"lng":32.282368,"speed":130,"direct":0,"time":"2018-08-23 16:56:37"}';
+    setNotificationList([json]);
 });*/
 
 $$('body').on('click', '.toggle-password', function() {
@@ -641,7 +635,6 @@ $$('body').on('click', '.routeButton', function() {
         );
 
         if (typeof navigator !== "undefined" && navigator.app) {
-            //plus.runtime.openURL(href);  
             navigator.app.loadUrl(href, { openExternal: true });
         } else {
             window.open(href, '_blank');
@@ -657,6 +650,34 @@ $$('body').on('click', '.reportTheft', function() {
 
     return false;
 });
+
+$$('body').on('click', '.viewAllButton', function() {
+    event.preventDefault();
+
+    loadPageViewAll();
+
+    return false;
+});
+
+$$('body').on('click', '.settingsButton', function() {
+    event.preventDefault();
+
+    MapControls.showMapControlls(this);
+
+    return false;
+});
+
+$$('body').on('click', '.menu_referral_button', function() {
+    event.preventDefault();
+
+   	showReferralModal();
+
+    return false;
+});
+
+
+
+
 
 
 
@@ -810,13 +831,19 @@ App.onPageInit('notification', function(page) {
                 if (typeof item.mileage === "undefined") {
                     item.mileage = '-';
                 }
+                var alertName = Protocol.Helper.getAlertNameByType(item.type);
 
                 ret = '<li class="swipeout" data-id="' + item.listIndex + '" data-title="' + item.title + '" data-type="' + item.type + '" data-imei="' + item.imei + '" data-name="' + item.name + '" data-lat="' + item.lat + '" data-lng="' + item.lng + '" data-time="' + item.time + '" data-speed="' + item.speed + '" data-direct="' + item.direct + '" data-mileage="' + item.mileage + '">' +
                     '<div class="swipeout-content item-content">' +
                     '<div class="item-inner">' +
-                    '<div class="item-title-row">' +
-                    '<div class="item-title">' + item.title + '</div>' +
-                    '<div class="item-after">' + item.time + '</div>' +
+                    '<div class="item-title-row">';
+               	if (alertName) {
+                    ret += '<div class="item-title">' + alertName + ' - ' + item.title + '</div>';
+                } else {
+                    ret += '<div class="item-title">' + item.title + '</div>';
+                }
+                //ret += '<div class="item-title">' + item.title + '</div>';
+                ret += '<div class="item-after">' + item.time + '</div>' +
                     '</div>' +
                     '<div class="item-subtitle">' + item.name + '</div>' +
                     '</div>' +
@@ -829,26 +856,15 @@ App.onPageInit('notification', function(page) {
                     '</div>' +
                     '</li>';
             }
+
+            //alert(item.type + ' ' + item.title);
             return ret;
         }
     });
 
-    /*var all_msg = [];
-    var oneMsg = {
-        'payload':{
-            'title':'testTitle',
-            'type':'testType',
-            'imei':'testImei',
-            'name':'testName',
-            'lat':0,
-            'lng':0,
-            'time':'2017-02-07T12:17:25',
-            'speed':0,
-            'direct':0,
-        },        
-    };    
-    all_msg.push(oneMsg);    
-    setNotificationList(all_msg);*/
+    //console.log('here');
+    /*var json = '{"title":"Speed","type":32,"imei":"0000004209084060","name":"A16 WATCH","lat":50.249984,"lng":32.282368,"speed":35,"direct":0,"time":"2018-08-23 16:56:37"}';
+    setNotificationList([json]);*/
 
     var user = localStorage.ACCOUNT;
     var notList = getNotificationList();
@@ -935,7 +951,6 @@ App.onPageInit('forgotPwd', function(page) {
 
     });
 });
-
 App.onPageInit('forgotPwdCode', function(page) {
     $$('.sendVerifyCode').on('click', function() {
         var VerifyCode = $$(page.container).find('input[name="VerifyCode"]').val();
@@ -1153,17 +1168,23 @@ App.onPageInit('asset.status', function(page) {
         if (asset && asset.Icon) {
             var pattern = /^IMEI_/i;
             if (pattern.test(asset.Icon)) {
-                AssetImg = 'http://upload.quiktrak.co/Attachment/images/' + asset.Icon + '?' + new Date().getTime();
+                AssetImg = 'https://upload.quiktrak.co/Attachment/images/' + asset.Icon + '?' + new Date().getTime();
             }
         }
+   
+        var MaxSpeed = asset.MaxSpeed;
+        /*if (MaxSpeed && asset.Unit) {
+            MaxSpeed = Protocol.Helper.getSpeedValue(asset.Unit, MaxSpeed);
+        }*/
 
-        console.log(asset);
+        //console.log(asset);
         mainView.router.load({
             url: 'resources/templates/asset.edit.html',
             context: {
                 IMEI: asset.IMEI,
                 PRDTName: asset.PRDTName,
                 Name: asset.Name,
+                Registration: asset.Registration,
                 Tag: asset.TagName,
                 Unit: asset.Unit,
                 Mileage: asset.InitMileage,
@@ -1172,7 +1193,8 @@ App.onPageInit('asset.status', function(page) {
                 Describe2: asset.Describe2,
                 Describe3: asset.Describe3,
                 Describe4: asset.Describe4,
-                AssetImg: AssetImg,
+                AssetImg: AssetImg,                
+                MaxSpeed: MaxSpeed,
             }
         });
 
@@ -1215,12 +1237,19 @@ App.onPageInit('asset.edit', function(page) {
     selectUnitSpeed.val(selectUnitSpeed.data("set"));
 
     $$('.saveAssetEdit').on('click', function() {
+        var Unit = $$(page.container).find('select[name="Unit"]').val();
+        var MaxSpeed = $$(page.container).find('input[name="MaxSpeed"]').val();
+        /*if (MaxSpeed && Unit) {
+            MaxSpeed = Protocol.Helper.getSpeedValue(Unit, MaxSpeed);
+        }
+        console.log(MaxSpeed);*/
 
         var device = {
             IMEI: $$(page.container).find('input[name="IMEI"]').val(),
             Name: $$(page.container).find('input[name="Name"]').val(),
+            Registration: $$(page.container).find('input[name="Registration"]').val(),
             Tag: $$(page.container).find('input[name="Tag"]').val(),
-            Unit: $$(page.container).find('select[name="Unit"]').val(),
+            Unit: Unit,
             Mileage: $$(page.container).find('input[name="Mileage"]').val(),
             Runtime: $$(page.container).find('input[name="Runtime"]').val(),
             Describe1: $$(page.container).find('input[name="Describe1"]').val(),
@@ -1228,6 +1257,7 @@ App.onPageInit('asset.edit', function(page) {
             Describe3: $$(page.container).find('input[name="Describe3"]').val(),
             Describe4: $$(page.container).find('input[name="Describe4"]').val(),
             Icon: TargetAsset.ASSET_IMG,
+            MaxSpeed: MaxSpeed,
         };
 
 
@@ -1244,7 +1274,9 @@ App.onPageInit('asset.edit', function(page) {
             encodeURIComponent(device.Describe4),
             encodeURIComponent(device.Tag),
             device.Icon,
-            userInfo.MajorToken
+            userInfo.MajorToken,
+            encodeURIComponent(device.Registration),
+            encodeURIComponent(device.MaxSpeed)
         );
 
         console.log(url);
@@ -1345,6 +1377,7 @@ App.onPageInit('alarms.assets', function(page) {
     var newAssetlist = [];
     var keys = Object.keys(assetList);
 
+
     $.each(keys, function(index, value) {
         assetList[value].Selected = false;
         newAssetlist.push(assetList[value]);
@@ -1356,7 +1389,7 @@ App.onPageInit('alarms.assets', function(page) {
         return 0;
     });
 
-    console.log(newAssetlist);
+    //console.log(newAssetlist);
 
     var virtualAlarmsAssetsList = App.virtualList('.alarmsAssetList', {
         items: newAssetlist,
@@ -1479,8 +1512,6 @@ App.onPageInit('alarms.assets', function(page) {
         },
     ];
 
-    var BeginTime = '19:00';
-    var EndTime = '06:00';
     /*if (geofence.Week && geofence.Week.length) {
         $.each(geofence.Week, function(index, value){       
             var dayIndex = daysOfWeekArray.findIndex(x => x.val === value.Week);
@@ -1498,15 +1529,15 @@ App.onPageInit('alarms.assets', function(page) {
                 assets.push(value.IMEI);
             }
         });
-        console.log(assets);
+        //console.log(assets);
         if (assets.length > 0) {
             mainView.router.load({
                 url: 'resources/templates/alarms.select.html',
                 context: {
                     Assets: assets.toString(),
                     DaysOfWeek: daysOfWeekArray,
-                    BeginTime: BeginTime,
-                    EndTime: EndTime,
+                    BeginTime: '07:00',
+                    EndTime: '18:00',
                     //IgnoreBetween: geofence.Inverse
                 }
             });
@@ -1527,8 +1558,9 @@ App.onPageInit('alarms.select', function(page) {
 
     //var alarmFields = ['accOff', 'accOn', 'customAlarm', 'custom2LowAlarm', 'geolock', 'geofenceIn', 'geofenceOut', 'illegalIgnition', 'lowBattery', 'mainBatteryFail', 'sosAlarm', 'speeding', 'tilt', 'harshAcc', 'harshBrk'];
 
-    var allCheckboxesLabel = $$(page.container).find('label.item-content');
-    var allCheckboxes = allCheckboxesLabel.find('input.input-checkbox-alarm');
+    //var allCheckboxesLabel = $$(page.container).find('label.item-content');
+    //var allCheckboxes = allCheckboxesLabel.find('input.input-checkbox-alarm');
+    var allCheckboxes = $$(page.container).find('input.input-checkbox-alarm');
     var assets = $$(page.container).find('input[name="Assets"]').val();
 
     var alarmPreferenceList = $$(page.container).find('.alarm_list');
@@ -1540,20 +1572,124 @@ App.onPageInit('alarms.select', function(page) {
     var BeginTimeValArray = BeginTimeInput.val() ? BeginTimeInput.val().split(':') : [];
     var EndTimeInputArray = EndTimeInput.val() ? EndTimeInput.val().split(':') : [];
 
+    var speedingInputEl = $$(page.container).find('input[name="checkbox-speeding"]');
+    var overspeedRadioWrapperEl = $$(page.container).find('.overspeed-radio-wrapper'); 
+    var overspeedRadioEl = $$(page.container).find('input[name="overspeed-radio"]');
+    var overspeedVal = page.context.MaxSpeed ? page.context.MaxSpeed : 80;
+
+    var offlineInputEl = $$(page.container).find('input[name="checkbox-offline"]');
+    var offlineOptionsWrapperEl = $$(page.container).find('.offline-options-wrapper'); 
+    var offlineOptionsEl = $$(page.container).find('input[name="offline-option"]');
+    var showHintEl = $$(page.container).find('.showHint');
+
+    showHintEl.on('click', function(){
+        var parent = this.closest('.hintParent');
+        var title = parent.getAttribute('data-hint-title');
+        var text = parent.getAttribute('data-hint-text');
+
+        var popoverHTML = `<div class="popover popover-status">
+            ${ title ? `<p class="color-dealer">${ title }</p>` : '' }
+            ${ text ? `<p >${ text }</p>` : '' }
+            </div>`;
+        App.popover(popoverHTML, this);
+    });
+    
+
+    speedingInputEl.on('change', function() {      
+        if (this.checked) {
+            overspeedRadioWrapperEl.removeClass('disabled');
+        }  else{
+            overspeedRadioWrapperEl.addClass('disabled');
+        }               
+    });
 
     alarm.on('change', function(e) {
-        if ($$(this).prop('checked')) {
-            allCheckboxes.prop('checked', true);
-        } else {
-            allCheckboxes.prop('checked', false);
+        for (var i = allCheckboxes.length - 1; i >= 0; i--) {
+            allCheckboxes[i].checked = this.checked;            
+            if (allCheckboxes[i].name == 'checkbox-speeding' || allCheckboxes[i].name == 'checkbox-offline') {
+                allCheckboxes[i].dispatchEvent(new Event('change'));  
+            }                      
         }
     });
 
-    allCheckboxes.on('change', function(e) {
-        if ($$(this).prop('checked')) {
-            alarm.prop('checked', true);
+    ignoreBetweenEl.on('change', function() {
+        pickerWrapperEl.toggleClass('disabled');
+        ignoreOnEl.toggleClass('disabled');
+    });   
+   
+    overspeedRadioEl.on('change', function(e) {        
+        if (e.target.value == 2) { 
+            App.modal({
+                title: '<div class="custom-modal-logo-wrapper"><img class="custom-modal-logo" src="resources/images/logo.png" alt=""/></div>',
+                text: '<div class="custom-modal-text">' + LANGUAGE.PROMPT_MSG060 + ':</div>',
+                afterText: `
+                <div class="list-block list-block-modal m-0 no-hairlines ">          
+                    <ul>                               
+                        <li>
+                            <div class="item-content pl-0">                                    
+                                <div class="item-inner pr-0">                                      
+                                    <div class="item-input item-input-field">
+                                        <input type="tel" placeholder="${ LANGUAGE.PROMPT_MSG060 }" name="Overspeed" value="${ overspeedVal}" class="only_numbers">
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                `,                      
+                buttons: [{
+                        text: LANGUAGE.COM_MSG04,
+                        onClick: function() {                                
+                            for (var i = overspeedRadioEl.length - 1; i >= 0; i--) {
+                                if (overspeedRadioEl[i].value == '1') { 
+                                    overspeedRadioEl[i].checked = true;
+                                    break; 
+                                }                                    
+                            }
+                        }
+                    },
+                    {
+                        text: LANGUAGE.COM_MSG38,
+                        bold: true,
+                        onClick: function(modal, e) {
+                            //console.log(modal, e);
+                            var enteredVal = $$(modal).find('input[name="Overspeed"]').val();
+                            overspeedVal = enteredVal ? enteredVal : 1;                               
+                        }
+                    },
+                ]
+            });
         }
     });
+
+    offlineInputEl.on('change', function(e) {
+        for (var i = offlineOptionsEl.length - 1; i >= 0; i--) {
+            offlineOptionsEl[i].checked = this.checked;
+        }
+        if (this.checked) {
+            offlineOptionsWrapperEl.removeClass('disabled');
+        } else{
+            offlineOptionsWrapperEl.addClass('disabled');
+        }  
+    });
+
+    offlineOptionsEl.on('change', function(e) {
+        let found = false;
+        for (var i = offlineOptionsEl.length - 1; i >= 0; i--) {
+            if (offlineOptionsEl[i].checked == true) {                
+                found = true;
+                break; 
+            }            
+        }
+        if (!found) {
+            this.checked = true;
+            App.addNotification({
+                hold: 3000,
+                message: LANGUAGE.PROMPT_MSG061
+            });
+        }        
+    });
+
 
     if (!BeginTimeValArray || !BeginTimeValArray.length) {
         BeginTimeValArray = ['07', '00'];
@@ -1677,11 +1813,7 @@ App.onPageInit('alarms.select', function(page) {
             }
         }
     });
-
-    ignoreBetweenEl.on('change', function() {
-        pickerWrapperEl.toggleClass('disabled');
-        ignoreOnEl.toggleClass('disabled');
-    });
+   
 
     $$('.saveAlarm').on('click', function(e) {
         var userInfo = getUserinfo();
@@ -1713,6 +1845,25 @@ App.onPageInit('alarms.select', function(page) {
             }
         }
 
+        if (speedingInputEl.is(":checked")) {
+            data.SpeedingMode = parseInt($$(page.container).find('input[name="overspeed-radio"]:checked').val(),10);
+            if (data.SpeedingMode == 2) {
+                data.MaxSpeed = overspeedVal;
+            }
+        }
+
+        if (offlineInputEl.is(":checked")) {   
+            data.OfflineHours = '';         
+            for (var i = offlineOptionsEl.length - 1; i >= 0; i--) {
+                if (offlineOptionsEl[i].checked) {
+                    data.OfflineHours += offlineOptionsEl[i].value + ',';
+                }                
+            }
+            if (data.OfflineHours) {
+                data.OfflineHours = data.OfflineHours.slice(0, -1);
+            }                
+        }
+
         /*console.log(data);*/
 
         App.showPreloader();
@@ -1731,6 +1882,25 @@ App.onPageInit('alarms.select', function(page) {
                         pageName: 'index',
                         force: true
                     });
+
+                    if (speedingInputEl.is(":checked")) {
+                        var arr = [];
+                        var assets = data.IMEIS.split(',');
+                        for (var i = assets.length - 1; i >= 0; i--) {
+                            var obj = {
+                                IMEI: assets[i], 
+                                Props: {                                    
+                                    MaxSpeedAlertMode: data.SpeedingMode
+                                }
+                            }
+                            if (data.SpeedingMode == 2) {
+                                obj.Props.MaxSpeed = data.MaxSpeed;
+                            }
+                            arr.push(obj);                            
+                        }                        
+                        updateAssetList3(arr);     
+                    }                   
+                    
 
                 } else {
                     App.alert('Something wrong');
@@ -1758,6 +1928,7 @@ App.onPageInit('geofence', function(page) {
     var geofenceList = getGeoFenceList();
     var arrGeofenceList = [];
     var geofenceListKeys = Object.keys(geofenceList);
+    var userInfo = getUserinfo();
 
 
     $.each(geofenceListKeys, function(index, value) {
@@ -1786,16 +1957,29 @@ App.onPageInit('geofence', function(page) {
         },
         items: arrGeofenceList,
         renderItem: function(index, item) {
+            var ret = '';
+            if (item.CustomerCode !== userInfo.MajorToken){ // if geofence is shared from master account
+                ret = '<li class="item-content" id="' + item.Code + '" data-code="' + item.Code + '" data-index="' + index + '" data-state="' + item.State + '" data-customer-code="'+item.CustomerCode+'">' +
+                        '<div class="item-inner">' +
+                            //'<div class="item-title-row">' +
+                                '<div class="item-title ">' + item.Name + '</div>' +
 
-            var ret = '<li class="item-content" id="' + item.Code + '" data-code="' + item.Code + '" data-index="' + index + '" data-state="' + item.State + '">' +
-                '<div class="item-inner">' +
-                '<div class="item-title-row">' +
-                '<div class="item-title label">' + item.Name + '</div>' +
-                '<div class="item-after "><a href="#" class="item-link geofence_menu"><i class="f7-icons icon-other-menu-geofence color-white"></i></a></div>' +
-                '</div>' +
-                '<div class="item-text">' + item.Address + '</div>' +
-                '</div>' +
-                '</li>';
+                            //'</div>' +
+                            '<div class="item-text">' + item.Address + '</div>' +
+                        '</div>' +
+                    '</li>';
+            }else{
+                ret = '<li class="item-content" id="' + item.Code + '" data-code="' + item.Code + '" data-index="' + index + '" data-state="' + item.State + '" data-customer-code="'+item.CustomerCode+'">' +
+                        '<div class="item-inner">' +
+                            '<div class="item-title-row">' +
+                                '<div class="item-title ">' + item.Name + '</div>' +
+                                '<div class="item-after "><a href="#" class="item-link geofence_menu"><i class="f7-icons icon-other-menu-geofence color-white"></i></a></div>' +
+                            '</div>' +
+                            '<div class="item-text">' + item.Address + '</div>' +
+                        '</div>' +
+                    '</li>';
+            }
+
 
             return ret;
         }
@@ -1822,7 +2006,15 @@ App.onPageInit('geofence', function(page) {
     });
 
     geofenceListContainer.on('click', '.item-title, .item-text', function() {
-        editGeofence($$(this).closest('li').data('code'));
+        var geofenceCode = $$(this).closest('li').data('code');
+        var customerCode = $$(this).closest('li').data('customer-code');
+        if  (customerCode !== userInfo.MajorToken){
+            loadGeofenceViewPage(geofenceCode);
+
+        }else{
+            editGeofence(geofenceCode);
+        }
+
     });
 
     geofenceListContainer.on('click', '.geofence_menu', function() {
@@ -1902,17 +2094,21 @@ App.onPageInit('geofence', function(page) {
 
 });
 
-
-
+App.onPageInit('geofence.view', function(page) {
+    showMapGeofence(getGeoFenceList()[page.context.Code]);
+});
+App.onPageBeforeRemove('geofence.view', function(page) {
+    MapTrack.off('draw:created', onMapGeofenceDraw);
+});
 
 App.onPageInit('geofence.add', function(page) {
     var valEdit = $$(page.container).find('input[name="geofenceEdit"]').val();
 
     var timeRangeState = $$(page.container).find('select[name="timeRangeState"]');
-    var timeRangeblocks = $$(page.container).find('.time_range_block');
+    //var timeRangeblocks = $$(page.container).find('.time_range_block');
     var searchGeofenceAddress = $$(page.container).find('form[name="searchGeofenceAddress"]');
     var container = $$(page.container).find('.page-content');
-    var radius = $$(page.container).find('input[name="geolockRadius"]');
+    //var radius = $$(page.container).find('input[name="geolockRadius"]');
     var address = $$(page.container).find('[name="geofenceAddress"]');
     var geofenceName = $$(page.container).find('input[name="geofenceName"]');
     var assets = $$(page.container).find('select[name="assets"]');
@@ -1933,9 +2129,23 @@ App.onPageInit('geofence.add', function(page) {
         EndTimeInputArray = ['06', '00'];
     }
 
+    var showHintEl = $$(page.container).find('.showHint');
+
+    showHintEl.on('click', function(){
+        var parent = this.closest('.hintParent');
+        var title = parent.getAttribute('data-hint-title');
+        var text = parent.getAttribute('data-hint-text');
+
+        var popoverHTML = `<div class="popover popover-status">
+            ${ title ? `<p class="color-dealer">${ title }</p>` : '' }
+            ${ text ? `<p >${ text }</p>` : '' }
+            </div>`;
+        App.popover(popoverHTML, this);
+    });
+
     //var today = new Date();
 
-    radius.on('change input', function() {
+    /*radius.on('change input', function() {
         var value = this.value;
         if (!value.match(/[^0-9]/g)) {
             window.PosMarker.geofence.setRadius(value);
@@ -1945,19 +2155,19 @@ App.onPageInit('geofence.add', function(page) {
                 MapTrack.flyToBounds([window.PosMarker.geofence.getBounds()], { padding: [8, 8] });
             }
         }
-    });
+    });*/
 
-    timeRangeState.on('change', function() {
+    /*timeRangeState.on('change', function() {
         var value = this.value;
         App.showTab('#tab' + value);
-    });
+    });*/
 
     assets.on('change', function() {
         var arrAssets = [];
         assets.find('option:checked').each(function() {
             arrAssets.push($$(this).data('imei'));
         });
-        updateGeofenceMarkerGroup(arrAssets);
+        updateGeofenceMarkerGroup(arrAssets, valEdit ? 1 : 0);
     });
 
     searchGeofenceAddress.on('submit', function(e) {
@@ -1967,7 +2177,7 @@ App.onPageInit('geofence.add', function(page) {
             Protocol.Helper.getLatLngByGeocoder(valAddress, function(latlng) {
                 if (latlng) {
                     container.scrollTop(0, 300, function() {
-                        window.PosMarker.geofence.setLatLng(latlng);
+                        //window.PosMarker.geofence.setLatLng(latlng);
                         MapTrack.setView(latlng);
                     });
                 } else {
@@ -2111,8 +2321,8 @@ App.onPageInit('geofence.add', function(page) {
     });
 
     if (valEdit) {
-        var geofence = getGeoFenceList()[valEdit];
-        showMapGeofence(geofence);
+
+        showMapGeofence(getGeoFenceList()[valEdit]);
 
     } else {
         showMapGeofence();
@@ -2122,7 +2332,7 @@ App.onPageInit('geofence.add', function(page) {
         var white_spaces = /([^\s])/;
         var valid = 1;
         var errorList = [];
-        var valRadius = radius.val();
+        //var valRadius = radius.val();
         var valGeofenceName = geofenceName.val();
         var alarmType = $$(page.container).find('select[name="alarmType"]');
         var valAlarmType = '';
@@ -2133,9 +2343,16 @@ App.onPageInit('geofence.add', function(page) {
         var ignoreTimeTo = $$(page.container).find('input[name="picker-to"]');
         var ignoreDaysArr = ignoreDays.val();
 
-        if (valRadius < 100) {
+        var geofenceLayers =  GeofenceFiguresGroup.getLayers();
+        var geofenceLayer = geofenceLayers.length ? geofenceLayers[0] : false;
+    //GeofenceFiguresGroup
+        /*if (valRadius < 100) {
             valid = 0;
             errorList.push(LANGUAGE.PROMPT_MSG008);
+        }*/
+        if (!geofenceLayer){
+            valid = 0;
+            errorList.push(LANGUAGE.PROMPT_MSG072);
         }
 
         if (!white_spaces.test(valGeofenceName)) {
@@ -2172,30 +2389,67 @@ App.onPageInit('geofence.add', function(page) {
             }
 
             var valAddress = address.val();
-            var latlng = window.PosMarker.geofence.getLatLng();
+            //var latlng = window.PosMarker.geofence.getLatLng();
             var state = $$(page.container).find('input[name="geofenceState"]');
             var valState = 0;
             if (state.is(":checked")) {
                 valState = 1;
             }
+            var shareEl = $$(page.container).find('input[name="geofence-share"]');
+
+
 
 
             var data = {
                 MajorToken: userInfo.MajorToken,
                 MinorToken: userInfo.MinorToken,
                 Name: valGeofenceName,
-                Lat: latlng.lat,
-                Lng: latlng.lng,
-                Radius: valRadius,
+                //Lat: latlng.lat,
+                //Lng: latlng.lng,
+                Radius: 0,
                 Alerts: valAlarmType,
                 DelayTime: 0,
-                //NotifyTypes: 1,
                 AlertConfigState: valState,
-                GeoType: 1,
+                GeoType: 1, //circle
                 AssetCodes: valAssets,
                 Address: valAddress,
+                Share: shareEl.is(":checked") ? 1 : 0,
                 Inverse: 0,
+                CycleType: 3, // NONE = 0, TIME = 1, DATE = 2, WEEK = 3
             };
+
+            if (geofenceLayer.options.radius) { //circle
+                var latlng = geofenceLayer.getLatLng();
+
+                data.Lat = latlng.lat;
+                data.Lng = latlng.lng;
+                data.Radius = parseInt(geofenceLayer.getRadius(),10);
+            }else{ // else Polygon
+                var latlngs = geofenceLayer.getLatLngs();
+                if (latlngs.length === 1 && $.isArray(latlngs[0]) && latlngs[0].length > 1) {
+                    latlngs=latlngs[0];
+                    if (latlngs[0].lat !== latlngs[latlngs.length-1].lat || latlngs[0].lng !== latlngs[latlngs.length-1].lng){
+                        latlngs.push(latlngs[0]);
+                    }
+                }
+
+                if (!isClockwise(latlngs)){
+                    latlngs = latlngs.reverse();
+                }
+
+                data.GeoType = 2;
+
+                var latlngArry=[];
+
+                for(var i=0;i<latlngs.length;i++){
+                    latlngArry.push(latlngs[i].lng+" "+latlngs[i].lat);
+                }
+                //latlngArry.push(latlngs[0].lng+" "+latlngs[0].lat);
+                data.GeoPolygon = "POLYGON(("+latlngArry.join(',')+"))";
+
+                data.Lat = latlngs[0].lat;
+                data.Lng = latlngs[0].lng;
+            }
 
             if (ignoreState.is(":checked")) {
                 data.Inverse = 1;
@@ -2203,9 +2457,9 @@ App.onPageInit('geofence.add', function(page) {
             if (ignoreDaysArr && ignoreDaysArr.length) {
                 data.Days = ignoreDaysArr.toString();
             }
-            data.BeginTime = moment(ignoreTimeFrom.val(), 'HH:mm').format('HH:mm:ss');
-            data.EndTime = moment(ignoreTimeTo.val(), 'HH:mm').format('HH:mm:ss');
-
+            data.BeginTime = moment(ignoreTimeFrom.val(), 'HH:mm').utc().format('HH:mm:ss');
+            data.EndTime = moment(ignoreTimeTo.val(), 'HH:mm').utc().format('HH:mm:ss');
+            //console.log(data);
             var url = API_URL.URL_GEOFENCE_ADD;
 
             if (valEdit) {
@@ -2213,7 +2467,7 @@ App.onPageInit('geofence.add', function(page) {
                 url = API_URL.URL_GEOFENCE_EDIT;
             }
 
-            //console.log(data);         
+            //console.log(data);
             saveGeofence(url, data);
 
         } else {
@@ -2237,6 +2491,8 @@ App.onPageInit('geofence.add', function(page) {
 App.onPageBeforeRemove('geofence.add', function(page) {
     // fix to close modal calendar if it was opened and default back button pressed
     App.closeModal('.custom-picker');
+
+    MapTrack.off('draw:created', onMapGeofenceDraw);
 });
 
 App.onPageInit('resetPwd', function(page) {
@@ -2282,12 +2538,14 @@ App.onPageInit('resetPwd', function(page) {
 });
 
 App.onPageInit('asset.alarm', function(page) {
+    //console.log(page.context);
     var alarm = $$(page.container).find('input[name = "checkbox-alarm"]');
 
     //var alarmFields = ['accOff', 'accOn', 'customAlarm', 'custom2LowAlarm', 'geolock', 'geofenceIn', 'geofenceOut', 'illegalIgnition', 'lowBattery', 'mainBatteryFail', 'sosAlarm', 'speeding', 'tilt', 'harshAcc', 'harshBrk'];
 
-    var allCheckboxesLabel = $$(page.container).find('label.item-content');
-    var allCheckboxes = allCheckboxesLabel.find('input.input-checkbox-alarm');
+    //var allCheckboxesLabel = $$(page.container).find('label.item-content');
+    //var allCheckboxes = allCheckboxesLabel.find('input.input-checkbox-alarm');
+    var allCheckboxes = $$(page.container).find('input.input-checkbox-alarm');
 
     var alarmPreferenceList = $$(page.container).find('.alarm_list');
     var ignoreBetweenEl = $$(page.container).find('[name="ignoreBetween"]');
@@ -2297,23 +2555,123 @@ App.onPageInit('asset.alarm', function(page) {
     var EndTimeInput = $$(page.container).find('[name="picker-to"]');
     var BeginTimeValArray = BeginTimeInput.val() ? BeginTimeInput.val().split(':') : [];
     var EndTimeInputArray = EndTimeInput.val() ? EndTimeInput.val().split(':') : [];
-    /*console.log(BeginTimeInput.val());
-    console.log(EndTimeInput.val());*/
+
+    var speedingInputEl = $$(page.container).find('input[name="checkbox-speeding"]');
+    var overspeedRadioWrapperEl = $$(page.container).find('.overspeed-radio-wrapper'); 
+    var overspeedRadioEl = $$(page.container).find('input[name="overspeed-radio"]');
+    var overspeedVal = page.context.MaxSpeed ? page.context.MaxSpeed : 80;
+
+    var offlineInputEl = $$(page.container).find('input[name="checkbox-offline"]');
+    var offlineOptionsWrapperEl = $$(page.container).find('.offline-options-wrapper'); 
+    var offlineOptionsEl = $$(page.container).find('input[name="offline-option"]');
+    var showHintEl = $$(page.container).find('.showHint');
+
+    showHintEl.on('click', function(){
+        var parent = this.closest('.hintParent');
+        var title = parent.getAttribute('data-hint-title');
+        var text = parent.getAttribute('data-hint-text');
+
+        var popoverHTML = `<div class="popover popover-status">
+            ${ title ? `<p class="color-dealer">${ title }</p>` : '' }
+            ${ text ? `<p >${ text }</p>` : '' }
+            </div>`;
+        App.popover(popoverHTML, this);
+    });
+
+    speedingInputEl.on('change', function() {      
+        if (this.checked) {
+            overspeedRadioWrapperEl.removeClass('disabled');
+        }  else{
+            overspeedRadioWrapperEl.addClass('disabled');
+        }               
+    });
 
     alarm.on('change', function(e) {
-        if ($$(this).prop('checked')) {
-            allCheckboxes.prop('checked', true);
-        } else {
-            allCheckboxes.prop('checked', false);
+        for (var i = allCheckboxes.length - 1; i >= 0; i--) {
+            allCheckboxes[i].checked = this.checked;            
+            if (allCheckboxes[i].name == 'checkbox-speeding' || allCheckboxes[i].name == 'checkbox-offline') {
+                allCheckboxes[i].dispatchEvent(new Event('change'));  
+            }                      
         }
     });
 
-    /*  allCheckboxes.on('change', function(e) {
-          if ($$(this).prop('checked')) {
-              alarm.prop('checked', true);
-          }
-      });*/
+    ignoreBetweenEl.on('change', function() {
+        pickerWrapperEl.toggleClass('disabled');
+        ignoreOnEl.toggleClass('disabled');
+    });   
+   
+    overspeedRadioEl.on('change', function(e) {        
+        if (e.target.value == 2) { 
+            App.modal({
+                title: '<div class="custom-modal-logo-wrapper"><img class="custom-modal-logo" src="resources/images/logo.png" alt=""/></div>',
+                text: '<div class="custom-modal-text">' + LANGUAGE.PROMPT_MSG060 + ':</div>',
+                afterText: `
+                <div class="list-block list-block-modal m-0 no-hairlines ">          
+                    <ul>                               
+                        <li>
+                            <div class="item-content pl-0">                                    
+                                <div class="item-inner pr-0">                                      
+                                    <div class="item-input item-input-field">
+                                        <input type="tel" placeholder="${ LANGUAGE.PROMPT_MSG060 }" name="Overspeed" value="${ overspeedVal}" class="only_numbers">
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                `,                      
+                buttons: [{
+                        text: LANGUAGE.COM_MSG04,
+                        onClick: function() {                                
+                            for (var i = overspeedRadioEl.length - 1; i >= 0; i--) {
+                                if (overspeedRadioEl[i].value == '1') { 
+                                    overspeedRadioEl[i].checked = true;
+                                    break; 
+                                }                                    
+                            }
+                        }
+                    },
+                    {
+                        text: LANGUAGE.COM_MSG38,
+                        bold: true,
+                        onClick: function(modal, e) {
+                            //console.log(modal, e);
+                            var enteredVal = $$(modal).find('input[name="Overspeed"]').val();
+                            overspeedVal = enteredVal ? enteredVal : 1;                               
+                        }
+                    },
+                ]
+            });
+        }
+    });
 
+    offlineInputEl.on('change', function(e) {
+        for (var i = offlineOptionsEl.length - 1; i >= 0; i--) {
+            offlineOptionsEl[i].checked = this.checked;
+        }
+        if (this.checked) {
+            offlineOptionsWrapperEl.removeClass('disabled');
+        } else{
+            offlineOptionsWrapperEl.addClass('disabled');
+        }  
+    });
+
+    offlineOptionsEl.on('change', function(e) {
+        let found = false;
+        for (var i = offlineOptionsEl.length - 1; i >= 0; i--) {
+            if (offlineOptionsEl[i].checked == true) {                
+                found = true;
+                break; 
+            }            
+        }
+        if (!found) {
+            this.checked = true;
+            App.addNotification({
+                hold: 3000,
+                message: LANGUAGE.PROMPT_MSG061
+            });
+        }        
+    });
 
 
     if (!BeginTimeValArray || !BeginTimeValArray.length) {
@@ -2439,11 +2797,7 @@ App.onPageInit('asset.alarm', function(page) {
         }
     });
 
-    ignoreBetweenEl.on('change', function() {
-        pickerWrapperEl.toggleClass('disabled');
-        ignoreOnEl.toggleClass('disabled');
-    });
-
+    
     $$('.saveAlarm').on('click', function(e) {
         var userInfo = getUserinfo();
         var ignoreDaysArr = $(page.container).find('[name="ignore-days"]').val();
@@ -2456,7 +2810,7 @@ App.onPageInit('asset.alarm', function(page) {
             DateTo: moment(EndTimeInput.val(), 'HH:mm').utc().format('HH:mm'),
             AlertTypes: 0,
             Weeks: '',
-            IsIgnore: 0,
+            IsIgnore: 0,            
         };
 
         if (ignoreBetweenEl.is(":checked")) {
@@ -2466,15 +2820,32 @@ App.onPageInit('asset.alarm', function(page) {
             data.Weeks = ignoreDaysArr.toString();
         }
         if (allCheckboxes && allCheckboxes.length) {
-            for (var i = allCheckboxes.length - 1; i >= 0; i--) {
-                /*if (allCheckboxes[i].checked) {*/
+            for (var i = allCheckboxes.length - 1; i >= 0; i--) {               
                 if (!allCheckboxes[i].checked) {
                     data.AlertTypes += parseInt(allCheckboxes[i].value, 10);
                 }
             }
         }
 
-        console.log(data);
+        if (speedingInputEl.is(":checked")) {
+            data.SpeedingMode = parseInt($$(page.container).find('input[name="overspeed-radio"]:checked').val(),10);
+            if (data.SpeedingMode == 2) {
+                data.MaxSpeed = overspeedVal;
+            }
+        }
+
+        if (offlineInputEl.is(":checked")) {   
+            data.OfflineHours = '';         
+            for (var i = offlineOptionsEl.length - 1; i >= 0; i--) {
+                if (offlineOptionsEl[i].checked) {
+                    data.OfflineHours += offlineOptionsEl[i].value + ',';
+                }                
+            }
+            if (data.OfflineHours) {
+                data.OfflineHours = data.OfflineHours.slice(0, -1);
+            }                
+        }
+        //console.log(data);
 
         App.showPreloader();
         $.ajax({
@@ -2486,9 +2857,22 @@ App.onPageInit('asset.alarm', function(page) {
             crossDomain: true,
             success: function(result) {
                 App.hidePreloader();
-                console.log(result);
+                //console.log(result);
                 if (result.MajorCode == '000') {
                     mainView.router.back();
+
+                    if (speedingInputEl.is(":checked")) {
+                        var obj = {
+                            IMEI: data.IMEIS, 
+                            Props: {                                    
+                                MaxSpeedAlertMode: data.SpeedingMode
+                            }
+                        }
+                        if (data.SpeedingMode == 2) {
+                            obj.Props.MaxSpeed = data.MaxSpeed;
+                        }
+                        updateAssetList3([obj]);
+                    }                        
 
                 } else {
                     App.alert('Something wrong');
@@ -2781,11 +3165,17 @@ App.onPageBeforeRemove('asset.playback', function(page) {
 App.onPageInit('asset.location', function(page) {
 
     var panoButton = $$(page.container).find('.pano_button');
+    var speedLimitEl = $$(page.container).find('.position_speedlimit');
     var lat = panoButton.data('lat');
     var lng = panoButton.data('lng');
     var latlng = new google.maps.LatLng(lat, lng);
+    var alertType = page.context.AlertType;
+    var speed = page.context.Speed;
+    var speedUnitCode = page.context.SpeedUnitCode;
+    var alertSpeedingType = page.context.SpeedingType;
 
     showMap({ 'lat': lat, 'lng': lng });
+    initSettingsButton();
 
     StreetViewService.getPanorama({ location: latlng, radius: 50 }, processSVData);
 
@@ -2796,10 +3186,68 @@ App.onPageInit('asset.location', function(page) {
         };
         showStreetView(params);
     });
+
+    if (alertType == 32 && alertSpeedingType == 1) {
+      
+    	$.ajax({
+	        type: "GET",
+	        url: API_URL.URL_GET_SPEEDLIMIT.format(page.context.Lat, page.context.Lng),
+	        data: {},
+	        async: true,
+	        crossDomain: true,
+	        cache: false,
+	        success: function(result) {
+	           //console.log(result);	
+	           	if (result && result.max) {
+	           		var speed = Protocol.Helper.getSpeedValue(speedUnitCode, parseInt(result.max));
+                    var speedUnit = Protocol.Helper.getSpeedUnit(speedUnitCode);
+	           		speedLimitEl.html(parseInt(speed) + ' '+ speedUnit);
+	           	}
+
+	        },
+	        error: function(XMLHttpRequest, textStatus, errorThrown) {
+	           console.log('womething wrong')
+	        }
+	    });
+    	    	
+        
+    }
+
+    //console.log(page)
 });
+App.onPageBeforeRemove('asset.location', function(page) {
+    MapControls.isGeofencesShowed() ? MapControls.hideGeofences() : '';
+});
+
+
+App.onPageInit('asset.track.all', function(page) {
+    showMapAll();
+    var assetList = getAssetList();
+
+    $$('.refreshTrack').on('click', function() {
+        updateAssetsPosInfo();
+    });
+
+    trackTimer = setInterval(function() {
+        updateAllMarkers(assetList);
+    }, 10000);
+
+    initSettingsButton();
+});
+
+
+
+App.onPageBeforeRemove('asset.track.all', function(page) {
+    clearInterval(trackTimer);
+    trackTimer = false;
+    MapControls.isGeofencesShowed() ? MapControls.hideGeofences() : '';
+
+});
+
 
 App.onPageInit('asset.track', function(page) {
     showMap();
+    initSettingsButton();
 
     var posTime = $$(page.container).find('.position_time');
     //var posDir = $$(page.container).find('.position_direction');
@@ -2883,6 +3331,7 @@ App.onPageInit('asset.track', function(page) {
 App.onPageBeforeRemove('asset.track', function(page) {
     clearInterval(trackTimer);
     trackTimer = false;
+    MapControls.isGeofencesShowed() ? MapControls.hideGeofences() : '';
 });
 
 App.onPageInit('asset.playback.show', function(page) {
@@ -3090,8 +3539,10 @@ function clearUserInfo() {
     POSINFOASSETLIST = {};
     var alarmList = getAlarmList();
     var pushList = getNotificationList();
+    var mapSettingsObg = getMapSettings();
 
     var ModalReview = !localStorage.ModalReview ? '' : localStorage.ModalReview;
+    var ModalReferral = !localStorage.ModalReferral ? '' : localStorage.ModalReferral;
     var FirstLoginDone = !localStorage.FirstLoginDone ? '' : localStorage.FirstLoginDone;
 
     localStorage.clear();
@@ -3122,6 +3573,9 @@ function clearUserInfo() {
     if (pushList) {
         localStorage.setItem("COM.QUIKTRAK.LIVE.NOTIFICATIONLIST.BW", JSON.stringify(pushList));
     }
+    if (mapSettingsObg) {
+        localStorage.setItem("COM.QUIKTRAK.LIVE.MAPSETTINGS", JSON.stringify(mapSettingsObg));
+    }
 
     if (deviceToken) {
         localStorage.PUSH_DEVICE_TOKEN = deviceToken;
@@ -3132,6 +3586,9 @@ function clearUserInfo() {
 
     if (ModalReview) {
         localStorage.ModalReview = ModalReview;
+    }
+    if (ModalReferral) {
+        localStorage.ModalReferral = ModalReferral;
     }
     if (FirstLoginDone) {
         localStorage.FirstLoginDone = FirstLoginDone;
@@ -3248,11 +3705,17 @@ function afterLogin(result) {
     var CountryCode = result.Data.User.CountryCode;
 
     if (CountryCode && CountryCode.toLowerCase() != 'aus') {
+      
         $$('.menu_call_button').hide();
-        //$$('.menu_wrapper').addClass('without-call-button');
+        $$('.menu_referral_button').hide();
+
+        $$('.menu_wrapper').removeClass('with-bigger-bottom-menu');
     } else {
+       
         $$('.menu_call_button').show();
-        //$$('.menu_wrapper').removeClass('without-call-button');
+        $$('.menu_referral_button').show();
+
+        $$('.menu_wrapper').addClass('with-bigger-bottom-menu');
     }
 }
 
@@ -3318,8 +3781,6 @@ function init_AssetList() {
     updateAssetsPosInfoTimer = setInterval(function() {
         updateAssetsPosInfo();
     }, 15000);
-
-
 
 }
 
@@ -3554,7 +4015,7 @@ function loadPageTheftReport() {
         imei: '',
         make: '',
         model: '',
-        rego: ''
+        registration: ''
     };
 
 
@@ -3571,11 +4032,11 @@ function loadPageTheftReport() {
     if (asset.Describe2) {
         param.model = encodeURIComponent(asset.Describe2.trim());
     }
-    if (asset.TagName) {
-        param.rego = encodeURIComponent(asset.TagName.trim());
+    if (asset.Registration) {
+        param.registration = encodeURIComponent(asset.Registration.trim());
     }
 
-    var href = API_URL.URL_REPORT_THEFT.format(param.loginName, param.imei, param.make, param.model, param.rego);
+    var href = API_URL.URL_REPORT_THEFT.format(param.loginName, param.imei, param.make, param.model, param.registration);
 
     if (typeof navigator !== "undefined" && navigator.app) {
         //plus.runtime.openURL(href); 
@@ -3629,6 +4090,17 @@ function loadPageSupport() {
     }
 }
 
+function loadPageViewAll() {
+
+    checkMapExisting();
+    mainView.router.load({
+        url: 'resources/templates/asset.track.all.html',
+        context: {
+            
+        }
+    });
+}
+
 function loadResetPwdPage() {
     mainView.router.load({
         url: 'resources/templates/resetPwd.html',
@@ -3643,7 +4115,7 @@ function getAssetImg(params, imgFor) {
     if (params && imgFor.assetList) {
         var pattern = /^IMEI_/i;
         if (params.Icon && pattern.test(params.Icon)) {
-            assetImg = '<img class="item_asset_img" src="http://upload.quiktrak.co/Attachment/images/' + params.Icon + '?' + new Date().getTime() + 'alt="">';
+            assetImg = '<img class="item_asset_img" src="https://upload.quiktrak.co/Attachment/images/' + params.Icon + '?' + new Date().getTime() + '" alt="">';
         } else if (params.Name) {
             params.Name = $.trim(params.Name);
             var splitted = params.Name.split(' ');
@@ -3713,6 +4185,219 @@ function showStreetView(params) {
     var panorama = new google.maps.StreetViewPanorama(document.getElementById('pano'), panoramaOptions);
 }
 
+function getMarkerDataTable(asset){
+           
+            //console.log(asset);
+            var markerData = '';
+            var customAddress = LANGUAGE.COM_MSG08;
+           
+            
+            if (asset ) {
+                var assetFeaturesStatus = Protocol.Helper.getAssetStateInfo(asset);        
+                if (assetFeaturesStatus && assetFeaturesStatus.stats) {
+                    var speed = 0;
+                    var mileage = '-'; 
+                    var launchHours = '';           
+                    var positionType = Protocol.Helper.getPositionType(parseInt(asset.posInfo.positionType));
+                    deirectionCardinal = Protocol.Helper.getDirectionCardinal(asset.posInfo.direct);
+                    if (typeof asset.Unit !== "undefined" && typeof asset.posInfo.speed !== "undefined") {
+                        speed = Protocol.Helper.getSpeedValue(asset.Unit, asset.posInfo.speed) + ' ' + Protocol.Helper.getSpeedUnit(asset.Unit);
+                    } 
+                    if (typeof asset.Unit !== "undefined" && typeof asset.posInfo.mileage !== "undefined" && asset.posInfo.mileage != '-') {
+                        mileage = Protocol.Helper.getMileage(asset, asset.posInfo.mileage);
+                    }
+                    if (typeof asset.posInfo.launchHours !== "undefined") {
+                        launchHours = Protocol.Helper.getEngineHours(asset, asset.posInfo.launchHours);
+                    }
+                    customAddress = !asset.posInfo.customAddress ? LANGUAGE.COM_MSG08 : asset.posInfo.customAddress;
+
+                    markerData += '<table cellpadding="0" cellspacing="0" border="0" class="marker-data-table">';
+                    markerData +=   '<tr>';
+                    markerData +=       '<td class="marker-data-caption">'+LANGUAGE.ASSET_TRACK_ALL_MSG001+'</td>';
+                    markerData +=       '<td class="marker-data-value">'+asset.Name+'</td>';
+                    markerData +=   '</tr>';          
+                    markerData +=   '<tr>';
+                    markerData +=       '<td class="marker-data-caption">'+LANGUAGE.ASSET_TRACK_ALL_MSG002+'</td>';
+                    markerData +=       '<td class="marker-data-value">'+assetFeaturesStatus.status.value+'</td>';
+                    markerData +=   '</tr>';            
+                    markerData +=   '<tr>';
+                    markerData +=       '<td class="marker-data-caption">'+LANGUAGE.ASSET_TRACK_ALL_MSG003+'</td>';
+                    markerData +=       '<td class="marker-data-value">'+asset.posInfo.positionTime.format(window.COM_TIMEFORMAT)+'</td>';
+                    markerData +=   '</tr>';
+                                    /*if (assetFeaturesStatus.stopped) {
+                    markerData +=   '<tr>';
+                    markerData +=       '<td class="marker-data-caption">'+LANGUAGE.ASSET_TRACK_ALL_MSG018+'</td>';
+                    markerData +=       '<td class="marker-data-value">'+assetFeaturesStatus.stopped.duration+'</td>';
+                    markerData +=   '</tr>';    
+                                    }*/
+                    markerData +=   '<tr>';
+                    markerData +=       '<td class="marker-data-caption">'+LANGUAGE.ASSET_TRACK_ALL_MSG004+'</td>';
+                    markerData +=       '<td class="marker-data-value">'+mileage+'</td>';
+                    markerData +=   '</tr>';
+                                    if (launchHours) {
+                    markerData +=   '<tr>';
+                    markerData +=       '<td class="marker-data-caption">'+LANGUAGE.ASSET_TRACK_ALL_MSG019+'</td>';
+                    markerData +=       '<td class="marker-data-value">'+launchHours+'</td>';
+                    markerData +=   '</tr>';    
+                                    }
+                    markerData +=   '<tr>';
+                    markerData +=       '<td class="marker-data-caption">'+LANGUAGE.ASSET_TRACK_ALL_MSG005+'</td>';
+                    markerData +=       '<td class="marker-data-value">'+speed+'</td>';
+                    markerData +=   '</tr>'; 
+                                    if (assetFeaturesStatus.acc) {
+                    markerData +=   '<tr>';
+                    markerData +=       '<td class="marker-data-caption">'+LANGUAGE.ASSET_TRACK_ALL_MSG006+'</td>';
+                    markerData +=       '<td class="marker-data-value">'+assetFeaturesStatus.acc.value+'</td>';
+                    markerData +=   '</tr>';
+                                    }            
+                                    if (assetFeaturesStatus.battery) {
+                    markerData +=   '<tr>';
+                    markerData +=       '<td class="marker-data-caption">'+LANGUAGE.ASSET_TRACK_ALL_MSG007+'</td>';
+                    markerData +=       '<td class="marker-data-value">'+assetFeaturesStatus.battery.value+'</td>';
+                    markerData +=   '</tr>';
+                                    }
+                                    if (assetFeaturesStatus.power) {
+                    markerData +=   '<tr>';
+                    markerData +=       '<td class="marker-data-caption">'+LANGUAGE.ASSET_TRACK_ALL_MSG008+'</td>';
+                    markerData +=       '<td class="marker-data-value">'+assetFeaturesStatus.power.value+'</td>';
+                    markerData +=   '</tr>';
+                                    }
+                                    if (assetFeaturesStatus.fuel) {
+                    markerData +=   '<tr>';
+                    markerData +=       '<td class="marker-data-caption">'+LANGUAGE.ASSET_TRACK_ALL_MSG009+'</td>';
+                    markerData +=       '<td class="marker-data-value">'+assetFeaturesStatus.fuel.value+'</td>';
+                    markerData +=   '</tr>';
+                                    }                           
+                    markerData +=   '<tr>';
+                    markerData +=       '<td class="marker-data-caption">'+LANGUAGE.ASSET_TRACK_ALL_MSG010+'</td>';
+                    markerData +=       '<td class="marker-data-value">'+deirectionCardinal+' ('+asset.posInfo.direct+'&deg;)</td>';
+                    markerData +=   '</tr>';   
+                                    if (positionType) {
+                    markerData +=   '<tr>';
+                    markerData +=       '<td class="marker-data-caption">'+LANGUAGE.ASSET_TRACK_ALL_MSG013+'</td>';
+                    markerData +=       '<td class="marker-data-value ">'+positionType+'</td>';
+                    markerData +=   '</tr>';
+                                    }                        
+                    markerData +=   '<tr>';
+                    markerData +=       '<td class="marker-data-caption">'+LANGUAGE.ASSET_TRACK_ALL_MSG011+'</td>';
+                    markerData +=       '<td class="marker-data-value ">'+ Protocol.Helper.convertDMS(asset.posInfo.lat, asset.posInfo.lng) +'</td>';
+                    markerData +=   '</tr>';
+                    markerData +=   '<tr>';
+                    markerData +=       '<td class="marker-data-caption">'+LANGUAGE.ASSET_TRACK_ALL_MSG012+'</td>';
+                    markerData +=       '<td class="marker-data-value address-'+asset.IMEI+'">'+customAddress+'</td>';
+                    markerData +=   '</tr>';
+                    markerData += '</table>';
+                }
+            }
+
+            return markerData;
+                
+        };
+
+function getGeofenceDataTable(geofence, options){
+
+	//console.log(geofence);
+	var markerData = '';
+	if (geofence) {
+		let assignedAssets = '';
+		let assetList = getAssetList();
+		let assignedAssetsCount = '0';
+		let BeginTime = '';
+		let EndTime = '';
+		let IgnoreDays = '';
+
+		if (options && options.geogroup) {
+			if (geofence.Assets && geofence.Assets.length) {
+				assignedAssetsCount = geofence.Assets.length;
+                for (var i = geofence.Assets.length - 1; i >= 0; i--) {                	
+                	assignedAssets += geofence.Assets[i].Name + ', ';
+                }
+            }
+		}else{
+			if (geofence.SelectedAssetList && geofence.SelectedAssetList.length) {
+				assignedAssetsCount = geofence.SelectedAssetList.length;
+                for (var i = geofence.SelectedAssetList.length - 1; i >= 0; i--) {
+                    if (assetList[geofence.SelectedAssetList[i].IMEI]){
+                        assignedAssets += assetList[geofence.SelectedAssetList[i].IMEI].Name + ', ';
+                    }else{
+                        assignedAssets += LANGUAGE.COM_MSG27 + ', ';
+                    }
+                }
+            }
+		}
+		if (assignedAssets) {
+			assignedAssets = assignedAssets.slice(0, -2);
+		}else{
+			assignedAssets = LANGUAGE.COM_MSG58;
+		}
+
+		if (geofence.Week && geofence.Week.length) {	       
+	        for (var i = 0; i < geofence.Week.length; i++) {	        	
+	        	IgnoreDays += geofence.Week.length > 2 ? Protocol.DaysOfWeek[geofence.Week[i].Week].nameSmall + ', ' : Protocol.DaysOfWeek[geofence.Week[i].Week].name + ', '; 
+	        }
+	        if (IgnoreDays) {
+	        	IgnoreDays = IgnoreDays.slice(0, -2);
+	        }
+	        BeginTime = geofence.Week[0].BeginTime ? moment(geofence.Week[0].BeginTime, 'HH:mm:ss').add(UTCOFFSET, 'minutes').format('HH:mm:ss') : BeginTime;
+	        EndTime = geofence.Week[0].EndTime ? moment(geofence.Week[0].EndTime, 'HH:mm:ss').add(UTCOFFSET, 'minutes').format('HH:mm:ss') : EndTime;
+	    }
+						 
+
+		markerData += `
+		<table cellpadding="0" cellspacing="0" border="0" class="marker-data-table">
+           	<tr>
+               <td class="marker-data-caption">${ options && options.geogroup ? LANGUAGE.GEOFENCE_MSG_34 : LANGUAGE.GEOFENCE_MSG_32}</td>
+               <td class="marker-data-value">${ geofence.Name }</td>
+           	</tr>
+           	<tr>
+            	<td class="marker-data-caption">${ LANGUAGE.GEOFENCE_MSG_33 }(${ assignedAssetsCount })</td>
+            	<td class="marker-data-value">${ assignedAssets }</td>
+        	</tr>			
+        	`;
+
+        if (options && !options.geogroup) {
+        	markerData += `
+	        	<tr>
+	            	<td class="marker-data-caption">${ LANGUAGE.GEOFENCE_MSG_07 }</td>
+	            	<td class="marker-data-value">${ Protocol.Helper.getGeofenceAlertType(geofence.Alerts) }</td>
+	        	</tr>
+	           	<tr>
+	               <td class="marker-data-caption">${ LANGUAGE.COM_MSG37 }</td>
+	               <td class="marker-data-value">${ geofence.State == 1 ? LANGUAGE.COM_MSG59 : LANGUAGE.COM_MSG60 }</td>
+	           	</tr>
+	           	<tr>
+	               <td class="marker-data-caption">${ LANGUAGE.GEOFENCE_MSG_28 }</td>
+	               <td class="marker-data-value">${ geofence.Inverse == 1 ? LANGUAGE.COM_MSG59 : LANGUAGE.COM_MSG60 }</td>
+	           	</tr>
+           	`;
+           	if (geofence.Inverse == 1) {
+           		markerData += `
+					<tr>
+		               <td class="marker-data-caption">${ LANGUAGE.ASSET_TRACK_ALL_MSG021 }</td>
+		               <td class="marker-data-value">${ BeginTime } - ${ EndTime }</td>
+		           	</tr>
+		           	<tr>
+		               <td class="marker-data-caption">${ LANGUAGE.GEOFENCE_MSG_31 }</td>
+		               <td class="marker-data-value">${ IgnoreDays }</td>
+		           	</tr>
+           		`;
+           	}
+        }        
+
+        markerData += ` 
+        	<tr>
+            	<td class="marker-data-caption">${ LANGUAGE.ASSET_TRACK_ALL_MSG011 }</td>
+            	<td class="marker-data-value ">${ Protocol.Helper.convertDMS(geofence.Lat, geofence.Lng) }</td>
+        	</tr>
+			<tr>
+            	<td class="marker-data-caption">${ LANGUAGE.ASSET_TRACK_ALL_MSG012 }</td>
+            	<td class="marker-data-value address-${ geofence.Code }">${ geofence.Address }</td>
+        	</tr>
+       	</table>`;
+	}
+	return markerData;
+}
+
 function showMap(params) {
 
     var asset = TargetAsset.ASSET_IMEI;
@@ -3730,6 +4415,77 @@ function showMap(params) {
         StreetViewService = new google.maps.StreetViewService();
     }
 }
+
+function showMapAll(params) {
+
+    var latlng = [0,0];   
+
+    MapTrack = Protocol.Helper.createMap({ target: 'map', latLng: latlng, zoom: 15 });
+    //window.PosMarker[asset].addTo(MapTrack);
+    var assetList = getAssetList(); 
+    AllMarkersGroup = L.markerClusterGroup({'maxClusterRadius':35});
+    if (assetList) {
+        var point = '';
+        var markerData = '';                
+        $.each(assetList, function(key, value){   
+            point = ''; 
+            markerData = '';
+            if (POSINFOASSETLIST[key] && POSINFOASSETLIST[key].posInfo && parseFloat(POSINFOASSETLIST[key].posInfo.lat) !== 0 && parseFloat(POSINFOASSETLIST[key].posInfo.lng) !== 0) {
+                point = L.marker([POSINFOASSETLIST[key].posInfo.lat,POSINFOASSETLIST[key].posInfo.lng], {icon: Protocol.MarkerIcon[1]});                         
+                markerData = getMarkerDataTable(POSINFOASSETLIST[key]);
+                point                            
+                    .bindPopup(markerData,{maxWidth: 280, closeButton: false})
+                    .on('popupopen', function (e) {                               
+                        if (!POSINFOASSETLIST[key].posInfo.customAddress) {
+                            Protocol.Helper.getAddressByGeocoder({lat: POSINFOASSETLIST[key].posInfo.lat, lng: POSINFOASSETLIST[key].posInfo.lng},function(address){                           
+                                POSINFOASSETLIST[key].posInfo.customAddress = address;                               
+                                markerData = getMarkerDataTable(POSINFOASSETLIST[key]);                           
+                                e.target.setPopupContent(markerData);                                        
+                                e.popup.update();                                       
+                            }); 
+                        }                                 
+                    });
+                /*if (app.device.desktop) {
+                    point.bindTooltip(POSINFOASSETLIST[key].Name,{permanent: false, direction: 'right'});
+                }*/
+                point._custom_asset_imei = key;
+                point.addTo(AllMarkersGroup);
+                POSINFOASSETLIST[key].markerId = AllMarkersGroup.getLayerId(point); 
+            }
+        });               
+        if (AllMarkersGroup.getBounds().isValid()) {
+            /*console.log(AllMarkersGroup.getBounds().isValid());*/
+            MapTrack.fitBounds(AllMarkersGroup.getBounds(),{padding:[16,16]});                 
+            AllMarkersGroup.addTo(MapTrack);
+        }                    
+    }    
+}
+
+function updateAllMarkers(assetList){
+     
+    $.each(assetList, function(key, value){
+        if (POSINFOASSETLIST[key] && POSINFOASSETLIST[key].posInfo && POSINFOASSETLIST[key].posInfo.lat !== 0 && POSINFOASSETLIST[key].posInfo.lng !== 0) {
+            var markerData = getMarkerDataTable(POSINFOASSETLIST[key]);
+            var point = AllMarkersGroup.getLayer(POSINFOASSETLIST[key].markerId);
+            if (point) {
+                point.setLatLng([POSINFOASSETLIST[key].posInfo.lat, POSINFOASSETLIST[key].posInfo.lng]).setPopupContent(markerData);
+                var popup = point.getPopup();
+                if (popup.isOpen()) {                        
+                    popup.update();
+                    Protocol.Helper.getAddressByGeocoder({lat: POSINFOASSETLIST[key].posInfo.lat, lng: POSINFOASSETLIST[key].posInfo.lng},function(address){                           
+                        POSINFOASSETLIST[key].posInfo.customAddress = address;
+                        if (popup.isOpen()) {
+                            markerData = getMarkerDataTable(POSINFOASSETLIST[key]);                           
+                            point.setPopupContent(markerData);                                     
+                            popup.update();
+                        }                    
+                    });     
+                }    
+            }                                            
+        }
+    });
+               
+};
 
 function showMapPlayback() {
     var optimizedState = $$('body .playback_page').find('input[name="optimizedState"]');
@@ -3975,20 +4731,16 @@ function updateGeofenceMarkerGroup(assets, geofenceEdit) {
         });
 
         if (geofenceMarkerGroup.getLayers().length > 0) {
-            var latlng = geofenceMarkerGroup.getBounds().getCenter();
-            if (!geofenceEdit) {
-                window.PosMarker.geofence.setLatLng(latlng);
-            }
-            MapTrack.flyToBounds([geofenceMarkerGroup.getBounds(), window.PosMarker.geofence.getBounds()], { padding: [8, 8] });
-
-            updateGeofenceAddress(latlng);
+            MapTrack.flyToBounds([geofenceMarkerGroup.getBounds(), GeofenceFiguresGroup.getBounds()], { padding: [8, 8] });
+        }else{
+            MapTrack.flyToBounds([GeofenceFiguresGroup.getBounds()], { padding: [8, 8] });
         }
         geofenceMarkerGroup.addTo(MapTrack);
     }
 
 }
 
-function updateGeofenceAddress(latlng) {
+/*function updateGeofenceAddress(latlng) {
     var container = $$('body');
     if (container.children('.progressbar, .progressbar-infinite').length) return; //don't run all this if there is a current progressbar loading
     App.showProgressbar(container);
@@ -3996,23 +4748,44 @@ function updateGeofenceAddress(latlng) {
         $$('body [name="geofenceAddress"]').val(address);
         App.hideProgressbar();
     });
-}
+}*/
 
 function showMapGeofence(geofence) {
     var latlng = ['-33.869444', '151.208333'];
-    var radius = 300;
+    //var radius = 300;
     geofenceMarkerGroup = L.markerClusterGroup({ 'maxClusterRadius': 35, });
+    // FeatureGroup is to store editable layers
+    GeofenceFiguresGroup = new L.FeatureGroup();
+    var geofenceFigure = false;
     var assets = [];
     var editFlag = 0;
+    var userInfo = getUserinfo();
 
     if (geofence) {
         editFlag = 1;
-        radius = geofence.Radius;
+        //radius = geofence.Radius;
         latlng = [geofence.Lat, geofence.Lng];
         if (geofence.SelectedAssetList && geofence.SelectedAssetList.length > 0) {
             $.each(geofence.SelectedAssetList, function(key, value) {
                 assets.push(value.IMEI);
             });
+        }
+        if (geofence.GeoType == 1) { //circle
+            geofenceFigure = L.circle(latlng, {
+                ...Protocol.PolygonCustomization,
+                radius: geofence.Radius,
+            });
+        }else{
+            if (geofence.GeoPolygon) {
+                var polygonCoordsArr = geofence.GeoPolygon.split('((').pop().split('))')[0].split(',');
+                var geojsonArr = [];
+                for (var i = polygonCoordsArr.length - 1; i >= 0; i--) {
+                    geojsonArr.push(polygonCoordsArr[i].split(' ').map(parseFloat).reverse());
+                }
+                geofenceFigure = L.polygon(geojsonArr, {
+                    ...Protocol.PolygonCustomization
+                });
+            }
         }
     } else {
         $.each(POSINFOASSETLIST, function(key, value) {
@@ -4021,26 +4794,59 @@ function showMapGeofence(geofence) {
             }
         });
     }
+    if (geofenceFigure){
+        GeofenceFiguresGroup.addLayer(geofenceFigure);
+    }
 
     MapTrack = Protocol.Helper.createMap({ target: 'map', latLng: latlng, zoom: 5 });
 
-    window.PosMarker.geofence = L.circle(latlng, {
-        color: '#AA5959',
-        fillColor: '#FF0000',
-        fillOpacity: 0.25,
-        radius: radius
-    }).addTo(MapTrack);
+    var drawControl = new L.Control.Draw({
+        draw: {
+            polyline: false,
+            marker: false,
+            circlemarker: false,
+            polygon: {
+                shapeOptions: Protocol.PolygonCustomization
+            },
+            circle: {
+                shapeOptions: Protocol.PolygonCustomization
+            },
+            rectangle: {
+                shapeOptions: Protocol.PolygonCustomization
+            }
+        },
+        edit: {
+            featureGroup: GeofenceFiguresGroup,
+            edit: {
+                //moveMarkers: true // centroids, default: false
+                selectedPathOptions: {
+                    moveMarkers: true
+                }
+            }
+        }
+    });
+
+    //check is this for view only page
+    if  (!geofence || userInfo.MajorToken == geofence.CustomerCode){
+        MapTrack.addControl(drawControl);
+    }
+
+
+    MapTrack.addLayer(GeofenceFiguresGroup);
 
     updateGeofenceMarkerGroup(assets, editFlag);
 
-    MapTrack.on('click', onMapGeofenceClick);
+    MapTrack.on('draw:created', onMapGeofenceDraw);
 }
 
-function onMapGeofenceClick(e) {
-    window.PosMarker.geofence.setLatLng(e.latlng);
+function onMapGeofenceDraw(e) {
+    var type = e.layerType,
+        layer = e.layer;
 
-    updateGeofenceAddress(e.latlng);
+    // Do whatever else you need to. (save to db, add to map etc)
+    GeofenceFiguresGroup.clearLayers().addLayer(layer);
 }
+
 
 function loadStatusPage() {
     var asset = POSINFOASSETLIST[TargetAsset.ASSET_IMEI];
@@ -4283,6 +5089,43 @@ function showNoCreditMessage() {
     });
 }
 
+function showReferralModal(autoShowed) {
+	var afterText = '';
+	if (autoShowed) {
+		afterText = '<div class="list-block no-hairlines modal-checkbox">' +
+            '<ul>' +
+            '<li>' +
+            '<label class="label-checkbox item-content">' +
+            '<input type="checkbox" name="checkbox-not-show-modal-referral" value="">' +
+            '<div class="item-media">' +
+            '<i class="icon icon-form-checkbox"></i>' +
+            '</div>' +
+            '<div class="item-inner">' +
+            '<div class="item-title">' + LANGUAGE.COM_MSG40 + '</div>' +
+            '</div>' +
+            '</label>' +
+            '</li>' +
+            '</ul>' +
+            '</div>';
+	}
+	var modal = App.modal({
+        title: LANGUAGE.PROMPT_MSG065,
+        text: `<div class="custom-modal-text">${ LANGUAGE.PROMPT_MSG066 } <b>${ LANGUAGE.PROMPT_MSG067 }</b> ${ LANGUAGE.PROMPT_MSG068 }</br>${ LANGUAGE.PROMPT_MSG069 } <a href="${ API_URL.URL_REFERRAL_PROGRAM }" class="external">${ LANGUAGE.PROMPT_MSG070 }</a> ${ LANGUAGE.PROMPT_MSG071 }</div>`,
+        afterText: afterText,
+        buttons: [{
+                text: LANGUAGE.COM_MSG38,
+                onClick: function(parent) {                	
+                    var checkboxState = parent.find('input[name="checkbox-not-show-modal-referral"]').is(":checked");
+                    if (checkboxState) {
+                        localStorage.ModalReferral = checkboxState;
+                    }
+                }
+            },
+            
+        ]
+    });
+}
+
 function showAskForReviewMessage() {
 
     var appId = '';
@@ -4319,8 +5162,8 @@ function showAskForReviewMessage() {
             '</div>',
         buttons: [{
                 text: LANGUAGE.COM_MSG39,
-                onClick: function() {
-                    var checkboxState = $$('body input[name="checkbox-not-show-modal-review"]').is(":checked");
+                onClick: function(parent) {
+                    var checkboxState = parent.find('input[name="checkbox-not-show-modal-review"]').is(":checked");
                     if (checkboxState) {
                         localStorage.ModalReview = checkboxState;
                     }
@@ -4329,8 +5172,8 @@ function showAskForReviewMessage() {
             {
                 text: LANGUAGE.COM_MSG38,
                 bold: true,
-                onClick: function() {
-                    var checkboxState = $$('body input[name="checkbox-not-show-modal-review"]').is(":checked");
+                onClick: function(parent) {
+                    var checkboxState = parent.find('input[name="checkbox-not-show-modal-review"]').is(":checked");
                     if (checkboxState) {
                         localStorage.ModalReview = checkboxState;
                     }
@@ -4401,7 +5244,6 @@ function getAlertConfig() {
     });
 }
 
-
 function loadAlarmPage(params) {
 
     var assetList = getAssetList();
@@ -4468,6 +5310,10 @@ function loadAlarmPage(params) {
             state: true,
             val: 2097152,
         },
+        offline: {
+            state: true,
+            val: 67108864,
+        },
         alarm: {
             state: true,
             //val: 0,
@@ -4516,7 +5362,6 @@ function loadAlarmPage(params) {
     var IsIgnore = 0;
 
 
-
     if (!params) {
         if (assetAlarmVal) {
             $.each(alarms, function(key, value) {
@@ -4524,6 +5369,9 @@ function loadAlarmPage(params) {
                     alarms[key].state = false;
                 }
             });
+            if (assetAlarmVal == 36931518) {
+                alarms.alarm.state = false;
+            }
         }
     } else {
 
@@ -4532,6 +5380,9 @@ function loadAlarmPage(params) {
                 alarms[key].state = false;
             }
         });
+        if (params.AlertTypes == 36931518) {
+            alarms.alarm.state = false;
+        }
 
         if (params.Weeks) {
             var selectedDays = params.Weeks.split(',');
@@ -4556,10 +5407,26 @@ function loadAlarmPage(params) {
         }
 
     }
-    /*console.log(params);
-    console.log(BeginTime);
-    console.log(EndTime);*/
 
+    var speedingMode = 1;
+    var overspeedRadio1 = true;
+    var overspeedRadio2 = false;
+    if (params && params.SpeedingMode && params.SpeedingMode == 2) {
+        overspeedRadio1 = !overspeedRadio1;
+        overspeedRadio2 = !overspeedRadio2;
+    }
+
+    var offlineOptions = {
+        '24': false,
+        '48': false,
+        '72': false,
+    }
+    if (params && params.OfflineHours) {
+        var selectedOfflineOptions = params.OfflineHours.split(',');
+        for (var i = selectedOfflineOptions.length - 1; i >= 0; i--) {
+            offlineOptions[selectedOfflineOptions[i]] = true;  
+        }
+    }
 
     mainView.router.load({
         url: 'resources/templates/asset.alarm.html',
@@ -4590,9 +5457,21 @@ function loadAlarmPage(params) {
             EndTime: EndTime,
             IgnoreBetween: IsIgnore,
 
+            SpeedingMode: speedingMode,
+            OverspeedRadio1: overspeedRadio1,
+            OverspeedRadio2: overspeedRadio2,
+            MaxSpeed: params.MaxSpeed ? params.MaxSpeed : 80,
+
+            offline: alarms.offline.state,
+            offline24: offlineOptions['24'],
+            offline48: offlineOptions['48'],
+            offline72: offlineOptions['72'],
+
         }
     });
 }
+
+
 
 function loadPlaybackPage() {
     var asset = POSINFOASSETLIST[TargetAsset.ASSET_IMEI];
@@ -4697,6 +5576,11 @@ function loadTrackPage(params) {
         latlng: {},
         name: '',
         time: '',
+        alertType: '',
+        showSpeedLimit: '',
+        speedlimit: LANGUAGE.COM_MSG08,
+        speedUnitCode: '',
+        speedingType: 1,
     };
     //{"title":"Acc off","type":65536,"imei":"0352544073967920","name":"Landcruiser Perth","lat":-32.032898333333335,"lng":115.86817722222216,"speed":0,"direct":0,"time":"2018-04-13 10:16:51"}
     if ((params && parseFloat(params.lat) !== 0 && parseFloat(params.lng) !== 0) || (parseFloat(asset.posInfo.lat) !== 0 && parseFloat(asset.posInfo.lng) !== 0)) {
@@ -4707,6 +5591,7 @@ function loadTrackPage(params) {
 
             if (asset && typeof asset.Unit !== "undefined" && typeof params.speed !== "undefined") {
                 details.speed = Protocol.Helper.getSpeedValue(asset.Unit, params.speed) + ' ' + Protocol.Helper.getSpeedUnit(asset.Unit);
+                details.speedUnitCode = asset.Unit;
             }
 
             details.templateUrl = 'resources/templates/asset.location.html';
@@ -4715,6 +5600,15 @@ function loadTrackPage(params) {
             details.name = params.name;
             details.time = params.time;
             details.direct = parseInt(params.direct);
+            details.alertType = params.type;
+
+            if (params.type && params.type == '32') {  //32 is speeding alert
+                details.showSpeedLimit = true;
+                if (asset.MaxSpeedAlertMode == '2') { //type 2 means alert triggerd from presetted speed, this speed we take from asset details
+                    details.speedingType = parseInt(asset.MaxSpeedAlertMode,10); 
+                    details.speedlimit = Protocol.Helper.getSpeedValue(asset.Unit, asset.MaxSpeed) + ' ' + Protocol.Helper.getSpeedUnit(asset.Unit);
+                }                
+            }
 
         } else {
             window.PosMarker[TargetAsset.ASSET_IMEI] = L.marker([asset.posInfo.lat, asset.posInfo.lng], { icon: Protocol.MarkerIcon[0] });
@@ -4722,6 +5616,7 @@ function loadTrackPage(params) {
             details.direct = asset.posInfo.direct;
             if (typeof asset.Unit !== "undefined" && typeof asset.posInfo.speed !== "undefined") {
                 details.speed = Protocol.Helper.getSpeedValue(asset.Unit, asset.posInfo.speed) + ' ' + Protocol.Helper.getSpeedUnit(asset.Unit);
+                details.speedUnitCode = asset.Unit;
             }
             if (typeof asset.Unit !== "undefined" && typeof asset.posInfo.mileage !== "undefined" && asset.posInfo.mileage != '-') {
                 details.mileage = (Protocol.Helper.getMileageValue(asset.Unit, asset.posInfo.mileage) + parseInt(asset.InitMileage) + parseInt(asset._FIELD_FLOAT7)) + '&nbsp;' + Protocol.Helper.getMileageUnit(asset.Unit);
@@ -4747,6 +5642,11 @@ function loadTrackPage(params) {
                 Lat: details.latlng.lat,
                 Lng: details.latlng.lng,
                 Coords: 'GPS: ' + Protocol.Helper.convertDMS(details.latlng.lat, details.latlng.lng),
+                AlertType: details.alertType,
+                ShowSpeedLimit: details.showSpeedLimit,
+                Speedlimit: details.speedlimit,
+                SpeedUnitCode: details.speedUnitCode,
+                SpeedingType: details.speedingType
             }
         });
 
@@ -5037,7 +5937,7 @@ function setEventsArray(array) {
 
 }
 
-function updateAssetsPosInfo() {
+function updateAssetsPosInfo(updateMarkers = false) {
     var userInfo = getUserinfo();
     var assetList = getAssetList();
     var codes = '';
@@ -5055,21 +5955,24 @@ function updateAssetsPosInfo() {
 
     //JSON1.request(url, function(result){ 
     JSON1.requestPost(url, data, function(result) {
-
             //console.log(result);                     
             if (result.MajorCode == '000') {
                 var data = result.Data;
                 var posData = '';
                 var imei = '';
+
                 $.each(data, function(key, value) {
                     posData = value;
                     imei = posData[1];
-                    if (!isObjEmpty(POSINFOASSETLIST[imei]) && !POSINFOASSETLIST[imei].posInfo.positionTime || POSINFOASSETLIST[imei] && posData[5] >= POSINFOASSETLIST[imei].posInfo.positionTime._i) {
+
+                    if ( !isObjEmpty(POSINFOASSETLIST[imei]) && !POSINFOASSETLIST[imei].posInfo.positionTime || POSINFOASSETLIST[imei] && posData[5] >= POSINFOASSETLIST[imei].posInfo.positionTime._i ) {
                         POSINFOASSETLIST[imei].initPosInfo(posData);
                     }
-
                 });
                 updateAssetsListStats();
+                if (updateMarkers) {
+                    updateAllMarkers(assetList);
+                }
             }
         },
         function() {}
@@ -5237,6 +6140,10 @@ function setAssetList(list) {
             StatusNew: list[i][index++],
             _FIELD_INT2: list[i][index++],
             GroupCode: list[i][index++],
+            Registration: list[i][index++],
+            StockNumber: list[i][index++],
+            MaxSpeed: list[i][index++],
+            MaxSpeedAlertMode: list[i][index++],
         };
     }
     setAssetListPosInfo(ary);
@@ -5258,6 +6165,8 @@ function updateAssetList(asset) {
 
     POSINFOASSETLIST[asset.IMEI].IMEI = list[asset.IMEI].IMEI = asset.IMEI;
     POSINFOASSETLIST[asset.IMEI].Name = list[asset.IMEI].Name = asset.Name;
+    POSINFOASSETLIST[asset.IMEI].Registration = list[asset.IMEI].Registration = asset.Registration;
+    POSINFOASSETLIST[asset.IMEI].StockNumber = list[asset.IMEI].StockNumber = asset.StockNumber;
     POSINFOASSETLIST[asset.IMEI].TagName = list[asset.IMEI].TagName = asset.Tag;
     POSINFOASSETLIST[asset.IMEI].Unit = list[asset.IMEI].Unit = asset.Unit;
     POSINFOASSETLIST[asset.IMEI].InitMileage = list[asset.IMEI].InitMileage = asset.Mileage;
@@ -5269,7 +6178,25 @@ function updateAssetList(asset) {
     if (asset.Icon) {
         POSINFOASSETLIST[asset.IMEI].Icon = list[asset.IMEI].Icon = asset.Icon + '?' + new Date().getTime();
     }
+    POSINFOASSETLIST[asset.IMEI].MaxSpeed = list[asset.IMEI].MaxSpeed = asset.MaxSpeed;
 
+    localStorage.setItem("COM.QUIKTRAK.LIVE.ASSETLIST", JSON.stringify(list));
+}
+
+function updateAssetList3(assets) {
+    var list = getAssetList();
+
+    for (var i = assets.length - 1; i >= 0; i--) {        
+        if (assets[i].IMEI && assets[i].Props) {
+            let keys = Object.keys(assets[i].Props);
+            for (const key of keys) {
+                list[assets[i].IMEI][key] = assets[i].Props[key];
+                if (POSINFOASSETLIST[assets[i].IMEI]) {
+                    POSINFOASSETLIST[assets[i].IMEI][key] = assets[i].Props[key];
+                }                
+            }
+        }
+    }
     localStorage.setItem("COM.QUIKTRAK.LIVE.ASSETLIST", JSON.stringify(list));
 }
 
@@ -5304,6 +6231,11 @@ function updateAssetList2(list) {
             _FIELD_FLOAT8: list[i][index++],
             StatusNew: list[i][index++],
             _FIELD_INT2: list[i][index++],
+            GroupCode: list[i][index++],
+            Registration: list[i][index++],
+            StockNumber: list[i][index++],
+            MaxSpeed: list[i][index++],
+            MaxSpeedAlertMode: list[i][index++],
         };
         /*$.each(ary[list[i][1]], function(key,value){
             if (POSINFOASSETLIST[list[i][1]]) {
@@ -5364,19 +6296,24 @@ function setAssetListPosInfo(listObj) {
     JSON1.requestPost(url, data, function(result) {
             console.log(result);
             if (result.MajorCode == '000') {
-                var data = result.Data;
+                //var data = result.Data;
                 if (result.Data) {
                     $.each(result.Data, function(key, value) {
+                        /*if (value[1] === '0000004210259869'){
+                            value[1] = 'test';
+                        }*/
                         var posData = value;
                         var imei = posData[1];
                         var protocolClass = posData[2];
                         var deviceInfo = listObj[imei];
-                        //console.log(protocolClass);
+                        //console.log(posData);
                         //console.log(deviceInfo);
+                        //console.log(!isObjEmpty(deviceInfo));
                         if  ( !isObjEmpty(deviceInfo) && deviceInfo.IMEI === imei){
                             POSINFOASSETLIST[imei] = Protocol.ClassManager.get(protocolClass, deviceInfo);
                             POSINFOASSETLIST[imei].initPosInfo(posData);
                         }
+
 
                     });
 
@@ -5393,7 +6330,9 @@ function setAssetListPosInfo(listObj) {
             setTimeout(function() {
                 if (!localStorage.ModalReview && localStorage.FirstLoginDone) {
                     showAskForReviewMessage();
-                }
+                }/*else if(!localStorage.ModalReferral){
+                	showReferralModal(true);
+                }*/
 
                 if (!localStorage.FirstLoginDone) {
                     localStorage.FirstLoginDone = true;
@@ -5874,6 +6813,20 @@ function showMsgNotification(arrMsgJ) {
     }
 }
 
+function setMapSettigns(list){
+    localStorage.setItem("COM.QUIKTRAK.LIVE.MAPSETTINGS", JSON.stringify(list));
+}
+function getMapSettings() {
+    var ret = null;
+    var str = localStorage.getItem("COM.QUIKTRAK.LIVE.MAPSETTINGS");
+    if(str) {
+        ret = JSON.parse(str);
+    }else{
+        ret = {};
+    }
+    return ret;
+}
+
 function setGeoFenceList(list) {
     localStorage.setItem("COM.QUIKTRAK.LIVE.GEOFENCELIST", JSON.stringify(list));
 }
@@ -5883,6 +6836,17 @@ function getGeoFenceList() {
     var str = localStorage.getItem("COM.QUIKTRAK.LIVE.GEOFENCELIST");
     if (str) { ret = JSON.parse(str); }
     return ret;
+}
+
+function loadGeofenceViewPage(code){
+    var geofence = getGeoFenceList()[code];
+    mainView.router.load({
+        url: 'resources/templates/geofence.view.html',
+        context: {
+            GeofenceName: geofence.Name,
+            Code: geofence.Code,
+        }
+    });
 }
 
 function editGeofence(code) {
@@ -5974,7 +6938,8 @@ function editGeofence(code) {
             DaysOfWeek: daysOfWeekArray,
             BeginTime: BeginTime,
             EndTime: EndTime,
-            IgnoreBetween: geofence.Inverse
+            IgnoreBetween: geofence.Inverse,
+            Share: geofence.Share
         }
     });
 
@@ -6108,8 +7073,201 @@ function formatArrAssetList() {
     return newAssetlist;
 }
 
+function initSettingsButton() {
+    
+    var userInfo = getUserinfo();
 
-function isObjEmpty(obj) {
+    var data = {
+        MajorToken: userInfo.MajorToken,
+        MinorToken: userInfo.MinorToken
+    };
+
+    var container = $$('body');
+    if (container.children('.progressbar, .progressbar-infinite').length) return; //don't run all this if there is a current progressbar loading
+    App.showProgressbar(container);
+    //App.showPreloader();
+    $.ajax({
+        type: "POST",
+        url: API_URL.URL_GET_GEOFENCE_LIST,
+        data: data,
+        async: true,
+        crossDomain: true,
+        cache: false,
+        success: function(result) {
+            //App.hidePreloader();
+            App.hideProgressbar();
+            if (result.MajorCode == '000') {
+                var geofenceList = result.Data;
+                setGeoFenceList(geofenceList);
+                
+                var mapSettingsObg = getMapSettings();
+                mapSettingsObg && mapSettingsObg.showGeofences ? MapControls.showGeofences() : ''; 
+            } 
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            //App.hidePreloader();
+            App.hideProgressbar();
+            App.alert(LANGUAGE.COM_MSG02);
+            
+        }
+    });
+}
+
+var MapControls = {
+    data: {
+        Geofences: [],
+    },
+    
+    isGeofencesShowed: function(){
+        return !!this.data.Geofences.length; //simplified this.data.Geofences.length ? true : false;
+    },
+    showGeofences: function(){      
+        var self = this;
+        if (!self.isGeofencesShowed()) {
+            var geofenceList = getGeoFenceList();// app.methods.getFromStorage('geofenceList');
+            //var groupList = app.methods.getFromStorage('groupList');
+
+            if (!isObjEmpty(geofenceList) ) {
+                const keys = Object.keys(geofenceList);             
+                for (const key of keys) {  
+                    let geofenceDetails = {
+                        Name: geofenceList[key].Name,
+                        Code: geofenceList[key].Code,                                 
+                    };
+                    /*let label = `${ LANGUAGE.GEOFENCE_MSG_32 }: ${geofenceList[key].Name} <br> ${ LANGUAGE.GEOFENCE_MSG_33 }: `;
+                    if (geofenceList[key].SelectedAssetList && geofenceList[key].SelectedAssetList.length) {
+                        label += geofenceList[key].SelectedAssetList.length;
+                    }else{
+                        label += '0';
+                    }*/
+                    let markerData = getGeofenceDataTable(geofenceList[key],{geogroup: false}); 
+                    if (geofenceList[key].GeoType == 1) { //circle                           
+                        if (geofenceList[key].Lat && geofenceList[key].Lng && geofenceList[key].Radius) {
+                            geofenceDetails.polygon = L.circle([geofenceList[key].Lat, geofenceList[key].Lng], {
+                                ...Protocol.PolygonCustomization,                            
+                                radius: geofenceList[key].Radius,
+                            }).bindPopup(markerData,{maxWidth: 280, closeButton: false})//.bindTooltip(label ,{permanent: false, direction: 'right'});  
+                        } 
+                    }else if (geofenceList[key].GeoPolygon) {
+                        var polygonCoordsArr = geofenceList[key].GeoPolygon.split('((').pop().split('))')[0].split(',');
+                        var geojsonArr = [];
+                        for (var i = polygonCoordsArr.length - 1; i >= 0; i--) {
+                            geojsonArr.push(polygonCoordsArr[i].split(' ').map(parseFloat).reverse());
+                        }                        
+                        geofenceDetails.polygon = L.polygon(geojsonArr, {
+                            ...Protocol.PolygonCustomization,                               
+                        }).bindPopup(markerData,{maxWidth: 280, closeButton: false}); //.bindTooltip(label ,{permanent: false, direction: 'right'});
+                    }                                       
+                    
+                    if (geofenceDetails.polygon) {
+                        geofenceDetails.polygon.addTo(MapTrack);
+                        self.data.Geofences.push(geofenceDetails); 
+                    }                                                                  
+                }                      
+            }
+
+            /*if (groupList && groupList.length) {
+                for (var i = groupList.length - 1; i >= 0; i--) {
+                    if (groupList[i].Code != '000000') {
+                        let geofenceDetails = {
+                            Name: groupList[i].Name,
+                            Code: groupList[i].Code,                                 
+                        };
+                        let label = `${ LANGUAGE.REPORT_PANEL_MSG54 }: ${groupList[i].Name} <br> ${ LANGUAGE.COM_MSG104 }: `;
+                        if (groupList[i].Assets && groupList[i].Assets.length) {
+                            label += groupList[i].Assets.length;
+                        }else{
+                            label += '0';
+                        }                    
+                        if (groupList[i].GeoType == 1) { //circle                           
+                            if (groupList[i].Lat && groupList[i].Lng && groupList[i].Radius) {
+                                geofenceDetails.polygon = L.circle([groupList[i].Lat, groupList[i].Lng], {
+                                    ...app.data.PolygonCustomization,                            
+                                    radius: groupList[i].Radius,
+                                }).bindTooltip(label,{permanent: false, direction: 'right'});  
+                            } 
+                        }else if (groupList[i].GeoPolygon) {
+                            var polygonCoordsArr = groupList[i].GeoPolygon.split('((').pop().split('))')[0].split(',');
+                            var geojsonArr = [];
+                            for (var y = polygonCoordsArr.length - 1; y >= 0; y--) {
+                                geojsonArr.push(polygonCoordsArr[y].split(' ').map(parseFloat).reverse());
+                            }                        
+                            geofenceDetails.polygon = L.polygon(geojsonArr, {
+                                ...app.data.PolygonCustomization,                               
+                            }).bindTooltip(label,{permanent: false, direction: 'right'});
+                                                                   
+                        }
+                        if (geofenceDetails.polygon) {
+                            geofenceDetails.polygon.addTo(MapTrack);
+                            self.data.Geofences.push(geofenceDetails); 
+                        }   
+                    }
+                }
+            }*/
+        } 
+    },
+    hideGeofences: function(){
+        var self = this;
+        if (self.data.Geofences && self.data.Geofences.length) {                    
+            for (var i = self.data.Geofences.length - 1; i >= 0; i--) {
+                if (self.data.Geofences[i].polygon) {
+                    MapTrack.removeLayer(self.data.Geofences[i].polygon);
+                }
+            }
+            self.data.Geofences.length = 0;
+        }
+    },
+    removeGeofence: function(code){
+        var self = this;
+        if (code && self.data.Geofences && self.data.Geofences.length) {
+            let index = self.data.Geofences.findIndex(el => el.Code == code);
+            if (index != -1) {
+                MapTrack.removeLayer(self.data.Geofences[index].polygon);
+            }           
+        }
+    },
+
+
+    showMapControlls: function(target){
+        var self = this;
+        var mapSettingsObg = getMapSettings();        
+        
+        var buttons = [
+            {
+                text: `
+                <div class="action_button_wrapper">
+                    <div class="action_button_block action_button_media">
+                        <i class="f7-icons icon-menu-geofence"></i>
+                    </div>
+                    <div class="action_button_block action_button_text">
+                        ${ LANGUAGE.COM_MSG57 }
+                    </div>
+                    <span class="label-switch actionButton-label">
+                        <input type="checkbox" name="checkbox-map-settings" value="showGeofences" ${ mapSettingsObg && mapSettingsObg.showGeofences ? 'checked' : '' }/>
+                        <div class="checkbox"></div>
+                    </span>
+                </div>`,
+                /*text: `<input type="hidden" name="checkbox-map-settings" value="showGeofences" ${ mapSettingsObg && mapSettingsObg.showGeofences ? 'checked' : '' }/>
+                        ${ mapSettingsObg && mapSettingsObg.showGeofences ? LANGUAGE.COM_MSG57 : LANGUAGE.COM_MSG61 }`,*/
+                onClick: function(parent) {
+                    var input = $$(parent).find('input[name="checkbox-map-settings"]');  
+                    var newState = !input.prop( "checked" );
+
+                    mapSettingsObg[input.val()] = newState;  
+
+                    setMapSettigns(mapSettingsObg);
+                    newState ? MapControls.showGeofences() : MapControls.hideGeofences();  
+                    
+                }                
+                 
+            },
+            
+        ];
+        App.actions(target, buttons);                
+    },
+};
+
+function isObjEmpty(obj) {           
     // null and undefined are "empty"
     if (obj == null) return true;
     // Assume if it has a length property with a non-zero value
@@ -6138,8 +7296,6 @@ function isClockwise(poly){
     }
     return sum > 0
 }
-
-
 
 
 /* ASSET EDIT PHOTO */
