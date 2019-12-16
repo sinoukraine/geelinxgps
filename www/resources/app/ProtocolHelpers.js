@@ -145,6 +145,7 @@ Protocol.TIANQIN_LK3G = JClass(Protocol.Common,{
     },
     initPosInfoEx:function(ary, posInfo){
         posInfo.Battery = ary[23];
+        posInfo.LBSWifi = ary[24];
     },
     initHisPosInfoEx:function(ary, posInfo){
         posInfo.Battery = ary[21];
@@ -395,13 +396,16 @@ Protocol.GOT20 = JClass(Protocol.Common,{
         posInfo.Input1Voltage = ary[24];
         posInfo.Input2Voltage = ary[25];
         posInfo.Engine = ary[26];
+        posInfo.launchHours= ary[26];
+
     },
     initHisPosInfoEx:function(ary, posInfo){
         posInfo.Voltage = ary[21];
         posInfo.Input1Voltage = ary[22];
         posInfo.Input2Voltage = ary[23];
         posInfo.Engine = ary[24];
-    },
+        posInfo.launchHours= ary[24];
+    }
 });
 Protocol.ClassManager.add("GOT20", Protocol.GOT20);
 
@@ -541,3 +545,20 @@ Protocol.EELINK_TEMP = JClass(Protocol.Common,{
     },    
 });
 Protocol.ClassManager.add("EELINK_TEMP", Protocol.EELINK_TEMP);
+
+Protocol.PHONE_TRACK = JClass(Protocol.Common,{
+    STATIC: {
+
+    },
+    constructor: function(arg) {
+        this.initDeviceInfo(arg);
+        this.posInfo = {};
+    },
+    initPosInfoEx:function(ary, posInfo){
+        posInfo.Battery = ary[14];
+    },
+    initHisPosInfoEx:function(ary, posInfo){
+        posInfo.Battery = ary[12];
+    }
+});
+Protocol.ClassManager.add("PHONE_TRACK", Protocol.PHONE_TRACK);
