@@ -1,11 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget 
-  version="1.0.1"
-  android-versionCode="3" 
-  ios-CFBundleVersion="3" 
-  id="com.warden.app" 
-  xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns="http://www.w3.org/ns/widgets" defaultlocale="en-US" >
-    <name>Warden</name>
+  version="2.0.0"
+  android-versionCode="4"
+  ios-CFBundleVersion="4"
+  id="com.warden.app"
+  xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:android="http://schemas.android.com/apk/res/android" defaultlocale="en-US" >
+  <!-- id="com.quiktrak.plus" -->
+    <name>WardenGPS</name>
     <description>
        Warden GPS tracker
     </description>
@@ -13,7 +14,8 @@
         Warden Co Limited
     </author>
     <content src="index.html" />
-    <access origin="*" />
+    <access origin="*"  allows-arbitrary-loads-for-media='true' allows-arbitrary-loads-in-web-content='true' allows-local-networking='true' />
+    
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
     <allow-intent href="tel:*" />
@@ -27,42 +29,82 @@
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
     </platform>
+    <platform name="android">
+  	  <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
+  	      <application android:usesCleartextTraffic="true" />
+  	  </edit-config>
+  	</platform>
+    <platform name="ios">
+        <preference name="WKWebViewOnly" value="true" />
+        <feature name="CDVWKWebViewEngine">
+            <param name="ios-package" value="CDVWKWebViewEngine" />
+        </feature>
+        <preference name="CordovaWebViewEngine" value="CDVWKWebViewEngine" />
+        <edit-config target="ITSAppUsesNonExemptEncryption" file="*-Info.plist" mode="merge">
+          <false/>
+        </edit-config>   
+    </platform>
+
+	<preference name="android-build-tool" value="gradle" />
+    <preference name="loadUrlTimeoutValue" value="700000" />
     <preference name="DisallowOverscroll" value="true" />
-    <preference name="Orientation" value="portrait" />
-    <preference name="android-minSdkVersion" value="18" />
+    <preference name="Orientation" value="default" />
+    <preference name="android-minSdkVersion" value="22" />
     <!-- <preference name="android-maxSdkVersion" value="27" /> -->
-    <preference name="android-targetSdkVersion" value="26" />
+    <preference name="android-targetSdkVersion" value="29" />
     <preference name="multiDexEnabled" value="true" />     
     <preference name="deployment-target" value="10.2" />
     <preference name="StatusBarOverlaysWebView" value="false" />
-    <!-- <preference name="StatusBarBackgroundColor" value="#333" /> -->
     <preference name="StatusBarStyle" value="blacktranslucent" />
-    <preference name="phonegap-version" value="cli-7.1.0" />
+    <preference name="phonegap-version" value="cli-9.0.0" />
+    <!-- <preference name="Fullscreen" value="true" /> -->
 
-    <preference name="android-build-tool" value="gradle" />
-    <plugin name="phonegap-plugin-push" source="npm" spec="2.1.2">
+    <!-- <platform name="ios">
+        <preference name="WKWebViewOnly" value="true" />
+    
+        <feature name="CDVWKWebViewEngine">
+            <param name="ios-package" value="CDVWKWebViewEngine" />
+        </feature>
+    
+        <preference name="CordovaWebViewEngine" value="CDVWKWebViewEngine" />
+    </platform> -->
+
+       
+    <plugin name="phonegap-plugin-push" source="npm" spec="2.3.0">
         <variable name="SENDER_ID" value="1097482483564" />
     </plugin>
     <platform name="android">
-      <resource-file src="google-services.json" target="google-services.json" />
+      <resource-file src="google-services.json" target="app/google-services.json" />
     </platform>
     <platform name="ios">
       <resource-file src="GoogleService-Info.plist" />
     </platform>
     
-    <!-- <plugin name="cordova-plugin-console" source="npm" spec="1.0.7" /> -->
+   
     <plugin name="cordova-plugin-statusbar" source="npm" spec="2.1.3" />
-    <plugin name="cordova-plugin-device" source="npm" spec="2.0.2" />
-    <plugin name="cordova-plugin-buildinfo" source="npm" spec="2.0.2" />    
+    <plugin name="cordova-plugin-device" source="npm" spec="2.0.3" />
+    <plugin name="cordova-plugin-buildinfo" source="npm" spec="4.0.0" />    
     <plugin name="cordova-plugin-dialogs" source="npm" spec="1.2.1" />
     <plugin name="cordova-plugin-whitelist" source="npm" spec="1.2.1" />
     <plugin name="cordova-plugin-splashscreen" source="npm" spec="5.0.2" />
-    <plugin name="cordova-plugin-camera" source="npm" spec="4.0.3"  />
-    <plugin spec="https://github.com/phonegap/phonegap-mobile-accessibility.git" source="git" />
+    <plugin name="cordova-plugin-camera" source="npm" spec="4.0.3"  />   
+    <plugin name="phonegap-plugin-mobile-accessibility" source="npm" spec="~1.0.5"  />
     <plugin name="cordova-launch-review" source="npm" spec="3.1.1" />
-    <plugin name="cordova-plugin-inappbrowser" source="npm" spec="3.0.0"  />
-<!--     <plugin name="cordova-android-support-gradle-release" source="npm" /> -->
-<!--     <plugin name="cordova-android-firebase-gradle-release" source="npm" /> -->
+    <plugin name="cordova-plugin-inappbrowser" source="npm" spec="4.0.0"  />
+    <plugin name="cordova-plugin-wkwebview-engine" spec="~1.2.1" />
+    <plugin name="cordova-plugin-wkwebview-file-xhr" spec="~2.1.4"/>
+
+    <plugin name="cordova-plugin-safariviewcontroller" source="npm" spec="1.6.0"/>
+    <!-- <plugin name="cordova-plugin-wkwebview-engine" source="npm" spec="1.2.1"  /> -->
+    <!-- <plugin name="cordova-plugin-wkwebview-file-xhr" source="npm" spec="2.1.4"  /> -->
+    
+    <plugin name="uk.co.workingedge.phonegap.plugin.istablet" source="npm" spec="1.2.0"  />
+    <plugin name="cordova-plugin-screen-orientation" source="npm" spec="3.0.2"  />
+    <plugin name="uk.co.workingedge.phonegap.plugin.launchnavigator" source="npm" spec="5.0.5">
+      <variable name="GOOGLE_API_KEY_FOR_ANDROID" value="" />
+    </plugin>
+    <plugin name="cordova-plugin-phone-call" source="npm" spec="1.0.7" />
+    
     
 
     <edit-config target="NSCameraUsageDescription" file="*-Info.plist" mode="merge">
@@ -71,15 +113,9 @@
     <edit-config target="NSPhotoLibraryUsageDescription" file="*-Info.plist" mode="merge">
         <string>You can select photo of your asset in your photo library and upload it into the app</string>
     </edit-config>
-    <!-- <edit-config platform="ios" target="NSLocationWhenInUseUsageDescription" file="*-Info.plist" mode="merge">
-        <string>need location access to find things nearby</string>
-    </edit-config> -->
     <edit-config target="NSPhotoLibraryAddUsageDescription" file="*-Info.plist" mode="merge">
         <string>Need photo library access to save pictures there</string>
     </edit-config>
-    <config-file platform="ios" target="*-Info.plist" parent="ITSAppUsesNonExemptEncryption">
-        <false/>
-    </config-file>  
 
 
     <platform name="android">
@@ -89,6 +125,8 @@
         <icon density="xhdpi" src="www/res/icon/android/drawable-xhdpi-icon.png" />
         <icon density="xxhdpi" src="www/res/icon/android/drawable-xxhdpi-icon.png" />
         <icon density="xxxhdpi" src="www/res/icon/android/drawable-xxxhdpi-icon.png" />
+
+  		<resource-file src="www/res/icon/android/notification.png" target="app/src/main/res/drawable/notification.png" />
         
         <splash density="port-ldpi" src="www/res/screen/android/drawable-port-ldpi-screen.png" />
         <splash density="port-mdpi" src="www/res/screen/android/drawable-port-mdpi-screen.png" />
