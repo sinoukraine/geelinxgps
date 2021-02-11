@@ -11,7 +11,7 @@
        Warden GPS tracker
     </description>
     <author email="support@sinopacific.co" href="http://sinopacific.co">
-        Warden Co Limited
+       Warden Co Limited
     </author>
     <content src="index.html" />
     <access origin="*"  allows-arbitrary-loads-for-media='true' allows-arbitrary-loads-in-web-content='true' allows-local-networking='true' />
