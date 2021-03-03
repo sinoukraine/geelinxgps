@@ -1,17 +1,17 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget 
-  version="2.0.0"
-  android-versionCode="8"
-  ios-CFBundleVersion="8"
-  id="com.warden.app"
+  version="1.0.0"
+  android-versionCode="1"
+  ios-CFBundleVersion="1"
+  id="com.geelinxgps.app"
   xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:android="http://schemas.android.com/apk/res/android" defaultlocale="en-US" >
   <!-- id="com.quiktrak.plus" -->
-    <name>WardenGPS</name>
+    <name>GeelinxGPS</name>
     <description>
-       Warden GPS tracker
+       GeelinxGPS tracker
     </description>
     <author email="support@sinopacific.co" href="http://sinopacific.co">
-       Warden Co Limited
+       GeelinxGPS Co Limited
     </author>
     <content src="index.html" />
     <access origin="*"  allows-arbitrary-loads-for-media='true' allows-arbitrary-loads-in-web-content='true' allows-local-networking='true' />

@@ -116,10 +116,10 @@
 }
 
 .bg-color-custom{
-    background-color: #0A397C!important;
+    background-color: #004AAD!important;
 }
 .text-color-custom{
-    color: #0A397C!important;
+    color: #004AAD!important;
 }
 .bg-color-custom-2{
     background-color: #81a42f!important;
@@ -176,10 +176,10 @@
 }
 
 .color-custom {
-    --f7-theme-color: #0A397C;
-    --f7-theme-color-rgb: 10,57,124;
-    --f7-theme-color-shade: #218a8e;
-    --f7-theme-color-tint: #3fccd3;
+    --f7-theme-color: #004AAD;
+    --f7-theme-color-rgb: 0,74,173;
+    --f7-theme-color-shade: #003b8a;
+    --f7-theme-color-tint: #005cd8;
 
     --f7-button-pressed-bg-color: #218a8e;
 }

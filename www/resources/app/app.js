@@ -50,11 +50,11 @@ API_URL.GEOFENCE_DELETE = API_DOMIAN1 + "Device/FenceDelete";
 
 API_URL.URL_ROUTE = "https://www.google.com/maps/dir/?api=1&destination={0},{1}";
 API_URL.URL_ROUTE_IOS = "maps://maps.apple.com/maps?daddr={0},{1}";
-API_URL.URL_SUPPORT = "https://support.wardengps.com/";
+API_URL.URL_SUPPORT = "https://support.geelinxgps.quiktrak.eu/";
 API_URL.URL_REPORT_THEFT = "https://forms.quiktrak.com.au/report-theft/";
-API_URL.URL_UPGRADE = "https://activation.warden.quiktrak.eu/";
+API_URL.URL_UPGRADE = "https://activation.geelinxgps.quiktrak.eu/";
 API_URL.REFERRAL_PROGRAM = "https://forms.quiktrak.com.au/referral-program/";
-API_URL.URL_USER_GUIDE = "https://wardengps.com/resources/manuals/warden/enduser/warden-app-guide.pdf";
+API_URL.URL_USER_GUIDE = "https://geelinxgps.quikloc8.com/manuals/app-guide.pdf";
 
 API_URL.GET_BALANCE = API_DOMIAN3 + "Balance";
 API_URL.EDIT_ACCOUNT = API_DOMIAN3 + "AccountEdit";
@@ -111,8 +111,8 @@ $$('#app').append(compiledTemplate());
 
 // Init App
 const app = new Framework7({
-    id: 'com.warden.app',
-    name: 'WardenGPS',
+    id: 'com.geelinxgps.app',
+    name: 'GeelinxGPS',
     root: '#app',
     theme: Framework7.device.ios ? 'ios' : 'md',
     view: {
@@ -136,7 +136,7 @@ const app = new Framework7({
             logo: 'resources/images/logo.png',
             logoBlack: 'resources/images/logo.png',
             logoModal: 'resources/images/logo.png',
-            logoExternal: 'https://wardengps.com/resources/images/login/warden/logoWarden.png',
+            logoExternal: 'https://geelinxgps.quikloc8.com/img/logo.png',
             MaxMapPopupWidth: maxPopupWidth,
             PolygonCustomization: {
                 color: '#AA5959',
@@ -180,9 +180,9 @@ const app = new Framework7({
                 },
             },
             AppDetails: {
-                name: 'wardengps-app',
-                code: 36,
-                supportCode: 36,
+                name: 'geelinxgps-app',
+                code: 49,
+                supportCode: 49,
                 appId: '',
                 appleId: '1457980996',
                 appVersion: '',
